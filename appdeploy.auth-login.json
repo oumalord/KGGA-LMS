@@ -1,0 +1,12 @@
+{
+  "headline": "Sign in to KGGA LMS",
+  "subtitle": "Empowering Girls Through Digital Learning, Leadership and Innovation.",
+  "style": {
+    "mode": "light",
+    "accentColor": "#0057B8",
+    "backgroundColor": "#FFFDF5",
+    "panelColor": "#FFFFFF",
+    "textColor": "#0B1F3A",
+    "borderRadius": 16
+  }
+}

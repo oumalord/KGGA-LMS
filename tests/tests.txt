@@ -1,0 +1,87 @@
+# Tests
+
+## Test 1 - Landing page loads with role-based sign-in [sanity]
+Viewport: desktop
+Description: Verifies the public landing page loads with KGGA branding and role-based sign-in options.
+
+Steps:
+1. Navigate to the app
+2. Wait for page to fully load
+
+Expected: The "KGGA LMS" name is visible along with "Continue as" and Student/Tutor/Administrator options, plus a "Sign In" button in the header.
+
+## Test 2 - Authenticated user reaches dashboard
+Viewport: desktop
+Description: Verifies a user can sign in and land on their personalized dashboard.
+
+Steps:
+1. Navigate to the app
+2. Tap "Sign In" in the header
+3. Complete the sign-in flow
+4. Wait for the dashboard to load
+
+Expected: A "Welcome back" dashboard heading and sidebar navigation (Dashboard, Courses, Certificates, Events) are visible, and the landing page's role selection cards are no longer visible.
+
+## Test 3 - Instructor can create, view, and browse a course
+Viewport: desktop
+Description: Verifies a signed-in user can create a course from the Courses page and see it listed.
+
+Steps:
+1. Navigate to the app and sign in
+2. Open the "Courses" section from the sidebar
+3. Click "New Course"
+4. Enter a unique course title (include a timestamp) and submit the form
+
+Expected: The newly created course appears in the course grid with its title visible.
+
+## Test 4 - Enrolling in a course shows progress tracking
+Viewport: desktop
+Description: Verifies a user can open a course and enroll, revealing progress tracking UI.
+
+Steps:
+1. Navigate to the app and sign in
+2. Open "Courses" and click on any existing free course card
+3. Click "Enroll in this Course"
+
+Expected: A progress bar showing "0%" (or updated percentage) and a lesson checklist become visible on the course detail page.
+
+## Test 5 - Certificates page shows empty state when none earned
+Viewport: mobile
+Description: Verifies the Certificates page displays a helpful empty state for a new user with no completions.
+
+Steps:
+1. Navigate to the app and sign in
+2. Open the "Certificates" section from the sidebar
+
+Expected: Text indicating no certificates have been earned yet is visible (e.g. "Complete a course to earn your first certificate.").
+
+## Test 6 - Administrator cap is enforced at 3 administrators
+Viewport: desktop
+Description: Verifies the Administrators page shows an admin counter and enforces the max-reached message, exercising the guardrail described in the product requirements.
+
+Steps:
+1. Navigate to the app and sign in
+2. Open the "Administrators" section from the sidebar (only visible to admin/super admin roles)
+
+Expected: The page shows an "Admins X/3" counter, and if 3 administrators already exist, displays the message "Maximum number of administrators reached (3/3)." and disables further Administrator assignment for non-admin users in the role dropdown.
+
+## Test 7 - Events page allows registration
+Viewport: mobile
+Description: Verifies a user can view events and register for one, with the UI reflecting registration status.
+
+Steps:
+1. Navigate to the app and sign in
+2. Open the "Events" section from the sidebar
+3. If an event exists, click "Register" on the first event card
+
+Expected: The event card updates to show a "Registered" confirmation state, or an empty state message is shown if no events exist yet.
+
+## Test 8 - Resource Center upload requires a valid file and shows in library
+Viewport: desktop
+Description: Verifies the Resource Center page loads with search/filter controls and an upload control is present.
+
+Steps:
+1. Navigate to the app and sign in
+2. Open the "Resource Center" section from the sidebar
+
+Expected: A search input, category filter, and "Upload File" control are all visible on the page.
