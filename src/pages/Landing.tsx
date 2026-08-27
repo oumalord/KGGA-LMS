@@ -34,8 +34,8 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
   const [videos, setVideos] = useState<KGGAVideo[]>([]);
   const [showLoginCard, setShowLoginCard] = useState(false);
   const [isStudentMode, setIsStudentMode] = useState(false);
-  const [identifier, setIdentifier] = useState("admin@kgga.org");
-  const [password, setPassword] = useState("kgga123");
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const heroSrc = settings.heroImageUrl || heroFallback;
 
@@ -98,8 +98,8 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             <button
               onClick={() => {
                 setIsStudentMode(false);
-                setIdentifier("admin@kgga.org");
-                setPassword("kgga123");
+                setIdentifier("");
+                setPassword("");
                 setShowLoginCard((value) => !value);
               }}
               disabled={signingIn}
@@ -137,11 +137,11 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             <form onSubmit={submitLogin} className="space-y-4">
               <label className="block text-xs font-semibold text-gray-500">
                 {isStudentMode ? "Phone number" : "Email address"}
-                <input value={identifier} onChange={(e) => setIdentifier(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" placeholder={isStudentMode ? "07XX XXX XXX" : "admin@kgga.org"} />
+                <input name="kgga-login-identifier" autoComplete="off" value={identifier} onChange={(e) => setIdentifier(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" placeholder={isStudentMode ? "07XX XXX XXX" : "admin@kgga.org"} />
               </label>
               <label className="block text-xs font-semibold text-gray-500">
                 Password
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" placeholder="Enter password" />
+                <input name="kgga-login-password" autoComplete="new-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" placeholder="Enter password" />
               </label>
               {loginError && <p className="text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">{loginError}</p>}
               <div className="flex flex-col gap-2 pt-1">
