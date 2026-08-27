@@ -5,6 +5,8 @@ import {
   Star, Clock, PlayCircle, CheckCircle2, Check,
 } from "lucide-react";
 import type { SiteSettings } from "../types";
+import type { KGGAVideo } from "../types";
+import { VideoPreview } from "./KGGAVideos";
 
 interface Props {
   onSignIn: (identifier?: string, password?: string) => void;
@@ -29,6 +31,7 @@ interface PublicCourse {
 
 export default function Landing({ onSignIn, signingIn, settings, heroFallback, autoOpenStudentLogin, studentNotice, onStudentLoginDismissed }: Props) {
   const [courses, setCourses] = useState<PublicCourse[]>([]);
+  const [videos, setVideos] = useState<KGGAVideo[]>([]);
   const [showLoginCard, setShowLoginCard] = useState(false);
   const [isStudentMode, setIsStudentMode] = useState(false);
   const [identifier, setIdentifier] = useState("admin@kgga.org");
@@ -38,6 +41,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
 
   useEffect(() => {
     api.get("/api/public/courses").then((r) => setCourses(r.data.courses)).catch(() => {});
+    api.get("/api/public/videos").then((r) => setVideos(r.data.videos ?? [])).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -71,9 +75,9 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
       <header className="sticky top-0 z-30 bg-[#071633]/95 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-[#FFD700] overflow-hidden flex items-center justify-center font-black text-[#071633] text-xs shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#FFD700] ring-2 ring-white/80 ring-offset-2 ring-offset-[#071633] shadow-[0_5px_18px_rgba(255,215,0,0.38)] overflow-hidden flex items-center justify-center font-black text-[#071633] text-xs shrink-0">
               {settings.logoImageUrl ? (
-                <img src={settings.logoImageUrl} alt="KGGA logo" className="w-full h-full object-cover" />
+                <img src={settings.logoImageUrl} alt="KGGA logo" className="w-full h-full object-cover drop-shadow-md" />
               ) : (
                 settings.logoText
               )}
@@ -284,6 +288,18 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
           </button>
         </div>
       </section>
+
+      {videos.length > 0 && (
+        <section id="videos" className="bg-[#071633] py-16">
+          <div className="max-w-7xl mx-auto px-6 lg:px-10">
+            <div className="flex items-end justify-between gap-4 mb-8">
+              <div><p className="text-[#FFD700] text-xs font-bold uppercase tracking-[0.18em] mb-2">From the KGGA community</p><h2 className="text-2xl lg:text-3xl font-extrabold text-white">Watch KGGA Videos</h2><p className="text-white/60 text-sm mt-2">Stories, skills and moments from our learning community.</p></div>
+              <PlayCircle className="text-[#FFD700] shrink-0" size={32} />
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">{videos.map((video) => <article key={video.id} className="overflow-hidden rounded-2xl bg-white/10 border border-white/10"><VideoPreview video={video} /><div className="p-4"><h3 className="font-bold text-white text-sm">{video.title}</h3>{video.description && <p className="text-white/60 text-xs mt-1">{video.description}</p>}</div></article>)}</div>
+          </div>
+        </section>
+      )}
 
       {/* Pricing */}
       <section id="pricing" className="bg-gray-50/60 border-y border-gray-100 py-16">

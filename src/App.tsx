@@ -16,6 +16,7 @@ import MyStudents from "./pages/MyStudents";
 import GoogleIntegration from "./pages/GoogleIntegration";
 import SiteSettings from "./pages/SiteSettings";
 import ProfilePage from "./pages/ProfilePage";
+import KGGAVideos from "./pages/KGGAVideos";
 import type { Page, Profile, SiteSettings as SiteSettingsType } from "./types";
 import { heroImageDataUrl } from "./heroImage";
 
@@ -216,6 +217,7 @@ function App() {
           {page === "admin-users" && isSuper && <AdminUsers profile={profile} />}
           {page === "google" && isSuper && <GoogleIntegration />}
           {page === "settings" && isSuper && <SiteSettings settings={settings} onUpdated={loadSettings} />}
+          {page === "kgga-videos" && isSuper && <KGGAVideos profile={profile} />}
           {page === "profile" && <ProfilePage profile={profile} />}
         </main>
       </div>

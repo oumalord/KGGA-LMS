@@ -51,9 +51,9 @@ export default function RoleSelect({ onSelect, initialError, settings }: Props) 
     <div className="min-h-screen bg-[#fbfbfd] flex items-center justify-center p-6">
       <div className="max-w-xl w-full">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-full bg-[#0057B8] overflow-hidden flex items-center justify-center font-bold text-[#FFD700] text-sm mx-auto mb-6">
+          <div className="w-14 h-14 rounded-full bg-[#0057B8] ring-2 ring-[#FFD700] ring-offset-2 ring-offset-white shadow-[0_6px_18px_rgba(0,87,184,0.3)] overflow-hidden flex items-center justify-center font-bold text-[#FFD700] text-sm mx-auto mb-6">
             {settings.logoImageUrl ? (
-              <img src={settings.logoImageUrl} alt="KGGA logo" className="w-full h-full object-cover" />
+              <img src={settings.logoImageUrl} alt="KGGA logo" className="w-full h-full object-cover drop-shadow-md" />
             ) : (
               settings.logoText
             )}

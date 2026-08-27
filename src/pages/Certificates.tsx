@@ -80,7 +80,7 @@ function CertificateModal({ cert, onClose, settings }: { cert: Certificate; onCl
             <div className="border-4 border-[#FFD700] rounded-2xl p-8 text-center relative">
               <div className="w-14 h-14 rounded-full bg-[#0057B8] overflow-hidden text-[#FFD700] font-black flex items-center justify-center mx-auto mb-4">
                 {settings.logoImageUrl ? (
-                  <img src={settings.logoImageUrl} alt="KGGA logo" className="w-full h-full object-cover" />
+                  <img src={settings.logoImageUrl} alt="KGGA logo" className="w-full h-full object-cover drop-shadow-md" />
                 ) : (
                   settings.logoText
                 )}

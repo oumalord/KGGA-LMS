@@ -1,4 +1,4 @@
-import { LayoutDashboard, BookOpen, Award, CalendarDays, FolderOpen, ShieldCheck, Cloud, User, LogOut, X, ClipboardCheck, Users2, Palette } from "lucide-react";
+import { LayoutDashboard, BookOpen, Award, CalendarDays, FolderOpen, ShieldCheck, Cloud, User, LogOut, X, ClipboardCheck, Users2, Palette, Video } from "lucide-react";
 import type { Page, Profile, SiteSettings } from "../types";
 
 interface Props {
@@ -35,6 +35,7 @@ export default function Sidebar({ page, setPage, profile, onSignOut, mobileOpen,
     items.push({ key: "admin-users", label: "Administrators", icon: ShieldCheck });
     items.push({ key: "google", label: "Google Workspace", icon: Cloud });
     items.push({ key: "settings", label: "Site Settings", icon: Palette });
+    items.push({ key: "kgga-videos", label: "KGGA Videos", icon: Video });
   }
   items.push({ key: "profile", label: "My Profile", icon: User });
 
@@ -48,9 +49,9 @@ export default function Sidebar({ page, setPage, profile, onSignOut, mobileOpen,
       >
         <div className="flex items-center justify-between px-5 py-5">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-[#0057B8] overflow-hidden flex items-center justify-center font-bold text-[#FFD700] text-xs shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#0057B8] ring-2 ring-[#FFD700] ring-offset-2 ring-offset-white shadow-[0_5px_14px_rgba(0,87,184,0.32)] overflow-hidden flex items-center justify-center font-bold text-[#FFD700] text-xs shrink-0">
               {settings.logoImageUrl ? (
-                <img src={settings.logoImageUrl} alt="KGGA logo" className="w-full h-full object-cover" />
+                <img src={settings.logoImageUrl} alt="KGGA logo" className="w-full h-full object-cover drop-shadow-md" />
               ) : (
                 settings.logoText
               )}

@@ -128,6 +128,17 @@ export interface Resource {
   uploadedAt: number;
 }
 
+export interface KGGAVideo {
+  id: string;
+  title: string;
+  description: string;
+  videoUrl: string;
+  contentType: string;
+  sourceType: "link" | "upload";
+  uploadedBy: string;
+  uploadedAt: number;
+}
+
 export interface Badge {
   id: string;
   userId: string;
@@ -187,4 +198,5 @@ export type Page =
   | "settings"
   | "grading"
   | "students"
-  | "profile";
+  | "profile"
+  | "kgga-videos";

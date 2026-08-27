@@ -99,9 +99,9 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
         <div className="mb-5 rounded-2xl border border-gray-100 bg-gray-50 p-4">
           <p className="text-[11px] font-semibold text-gray-500 mb-3">Logo</p>
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-2xl bg-[#0057B8] overflow-hidden flex items-center justify-center text-[#FFD700] font-black shrink-0">
+            <div className="w-20 h-20 rounded-2xl bg-[#0057B8] ring-2 ring-[#FFD700] ring-offset-3 ring-offset-gray-50 shadow-[0_8px_22px_rgba(0,87,184,0.3)] overflow-hidden flex items-center justify-center text-[#FFD700] font-black shrink-0">
               {logoImageUrl ? (
-                <img src={logoImageUrl} alt="KGGA logo preview" className="w-full h-full object-cover" />
+                <img src={logoImageUrl} alt="KGGA logo preview" className="w-full h-full object-cover drop-shadow-md" />
               ) : (
                 <span className="text-lg">{logoText}</span>
               )}

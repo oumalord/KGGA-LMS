@@ -859,6 +859,66 @@ export const handler = router({
     },
   ],
 
+  "GET /api/public/videos": [
+    async () => {
+      const { items } = await db.list<any>("kgga_videos", { limit: 100 });
+      return json({ videos: items });
+    },
+  ],
+
+  "GET /api/videos": [
+    requireAuth(),
+    async (ctx) => {
+      const me = await requireProfile(ctx);
+      if (!me || !isSuper(me.role)) return error("Forbidden", 403);
+      const { items } = await db.list<any>("kgga_videos", { limit: 100 });
+      return json({ videos: items });
+    },
+  ],
+
+  "POST /api/videos": [
+    requireAuth(),
+    async (ctx) => {
+      const me = await requireProfile(ctx);
+      if (!me || !isSuper(me.role)) return error("Only the Super Administrator can add KGGA videos", 403);
+      const body = ctx.body as { title: string; description?: string; videoUrl: string };
+      if (!body.title?.trim() || !body.videoUrl?.trim()) return error("Title and video link are required", 400);
+      const record = { title: body.title.trim(), description: body.description?.trim() || "", videoUrl: body.videoUrl.trim(), contentType: "video/*", sourceType: "link", uploadedBy: me.name, uploadedAt: Date.now() };
+      const [id] = await db.add("kgga_videos", [record]);
+      return json({ id, video: { id, ...record } });
+    },
+  ],
+
+  "POST /api/videos/upload": [
+    requireAuth(),
+    async (ctx) => {
+      const me = await requireProfile(ctx);
+      if (!me || !isSuper(me.role)) return error("Only the Super Administrator can upload KGGA videos", 403);
+      const body = ctx.body as { title: string; description?: string; contentBase64: string; contentType: string };
+      if (!body.title?.trim() || !body.contentBase64 || !body.contentType?.startsWith("video/")) return error("A title and valid video file are required", 400);
+      const path = `kgga-videos/${Date.now()}`;
+      const [ok] = await storage.write([{ path, content: body.contentBase64, contentType: body.contentType }]);
+      if (!ok) return error("Upload failed", 500);
+      const [{ url }] = await storage.url([path]);
+      const record = { title: body.title.trim(), description: body.description?.trim() || "", videoUrl: url, path, contentType: body.contentType, sourceType: "upload", uploadedBy: me.name, uploadedAt: Date.now() };
+      const [id] = await db.add("kgga_videos", [record]);
+      return json({ id, video: { id, ...record } });
+    },
+  ],
+
+  "DELETE /api/videos/:id": [
+    requireAuth(),
+    async (ctx) => {
+      const me = await requireProfile(ctx);
+      if (!me || !isSuper(me.role)) return error("Forbidden", 403);
+      const [video] = await db.get<any>("kgga_videos", [ctx.params.id]);
+      if (!video) return error("Video not found", 404);
+      if (video.path) await storage.delete([video.path]);
+      await db.delete("kgga_videos", [ctx.params.id]);
+      return json({ success: true });
+    },
+  ],
+
   "POST /api/resources": [
     requireAuth(),
     async (ctx) => {

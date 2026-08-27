@@ -24,6 +24,7 @@ const COURSES_KEY = "kgga-lms-courses";
 const ENROLLMENTS_KEY = "kgga-lms-enrollments";
 const CERTIFICATES_KEY = "kgga-lms-certificates";
 const RESOURCES_KEY = "kgga-lms-resources";
+const VIDEOS_KEY = "kgga-lms-videos";
 const SUBMISSIONS_KEY = "kgga-lms-submissions";
 
 const DEFAULT_USERS = [
@@ -221,6 +222,14 @@ function writeStoredResources(resources: any[]) {
   writeStorageJson(RESOURCES_KEY, resources);
 }
 
+function getStoredVideos() {
+  return readStorageJson(VIDEOS_KEY, [] as any[]);
+}
+
+function writeStoredVideos(videos: any[]) {
+  writeStorageJson(VIDEOS_KEY, videos);
+}
+
 function getCurrentAuthProfile() {
   if (typeof window === "undefined") return null;
   const storedIdentifier = window.localStorage.getItem(AUTH_ID_KEY);
@@ -292,6 +301,10 @@ export const api: ApiClient = {
       return { data: { courses: getStoredCourses() } as T };
     }
 
+    if (url.includes("/api/public/videos")) {
+      return { data: { videos: getStoredVideos() } as T };
+    }
+
     if (url.includes("/api/settings/public")) {
       return { data: readStoredSettings() as T };
     }
@@ -336,6 +349,10 @@ export const api: ApiClient = {
       const resourceId = url.split("/api/resources/")[1]?.split("/")[0];
       const resource = getStoredResources().find((entry: any) => entry.id === resourceId);
       return { data: { url: resource?.path || "" } as T };
+    }
+
+    if (url.includes("/api/videos")) {
+      return { data: { videos: getStoredVideos() } as T };
     }
 
     if (url.includes("/api/courses/") && url.includes("/submissions")) {
@@ -401,6 +418,22 @@ export const api: ApiClient = {
       const logoImageUrl = `data:${contentType};base64,${contentBase64}`;
       writeStoredSettings({ logoImageUrl });
       return { data: { success: true, logoImageUrl } as T };
+    }
+
+    if (url.includes("/api/videos/upload")) {
+      const payload = body as { title?: string; description?: string; contentBase64?: string; contentType?: string };
+      const contentType = payload?.contentType || "video/mp4";
+      const videoUrl = `data:${contentType};base64,${payload?.contentBase64 || ""}`;
+      const video = { id: `video-${Date.now()}`, title: payload?.title || "KGGA Video", description: payload?.description || "", videoUrl, contentType, sourceType: "upload", uploadedBy: getCurrentAuthProfile()?.name || "Administrator", uploadedAt: Date.now() };
+      writeStoredVideos([video, ...getStoredVideos()]);
+      return { data: { video } as T };
+    }
+
+    if (url.includes("/api/videos")) {
+      const payload = body as { title?: string; description?: string; videoUrl?: string };
+      const video = { id: `video-${Date.now()}`, title: payload?.title || "KGGA Video", description: payload?.description || "", videoUrl: payload?.videoUrl || "", contentType: "video/*", sourceType: "link", uploadedBy: getCurrentAuthProfile()?.name || "Administrator", uploadedAt: Date.now() };
+      writeStoredVideos([video, ...getStoredVideos()]);
+      return { data: { video } as T };
     }
 
     if (url.includes("/api/me/role")) {
@@ -603,6 +636,12 @@ export const api: ApiClient = {
       const userId = url.split("/api/users/")[1];
       const nextUsers = getStoredUsers().filter((user: any) => user.id !== userId);
       writeStoredUsers(nextUsers);
+      return { data: { success: true } as T };
+    }
+
+    if (url.includes("/api/videos/")) {
+      const videoId = url.split("/api/videos/")[1];
+      writeStoredVideos(getStoredVideos().filter((video: any) => video.id !== videoId));
       return { data: { success: true } as T };
     }
 

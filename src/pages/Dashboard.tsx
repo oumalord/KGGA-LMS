@@ -119,9 +119,9 @@ export default function Dashboard({
       {isSuper && (
         <div className="bg-white rounded-2xl p-5 shadow-[0_6px_24px_rgba(0,0,0,0.05)] border border-gray-50 mb-6">
           <div className="flex items-center gap-4 flex-col sm:flex-row">
-            <div className="w-20 h-20 rounded-2xl bg-[#0057B8] overflow-hidden flex items-center justify-center shrink-0">
+            <div className="w-20 h-20 rounded-2xl bg-[#0057B8] ring-2 ring-[#FFD700] ring-offset-3 ring-offset-white shadow-[0_8px_22px_rgba(0,87,184,0.3)] overflow-hidden flex items-center justify-center shrink-0">
               {logoPreview ? (
-                <img src={logoPreview} alt="Brand logo preview" className="w-full h-full object-cover" />
+                <img src={logoPreview} alt="Brand logo preview" className="w-full h-full object-cover drop-shadow-md" />
               ) : (
                 <span className="text-[#FFD700] text-lg font-black">{settings.logoText}</span>
               )}
