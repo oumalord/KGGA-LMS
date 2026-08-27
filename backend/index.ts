@@ -283,6 +283,7 @@ export const handler = router({
     async () => {
       const settings = await getSettings();
       let heroImageUrl: string | null = null;
+      let logoImageUrl: string | null = settings?.logoImageUrl || null;
       if (settings?.heroImagePath) {
         try {
           const [{ url }] = await storage.url([settings.heroImagePath]);
@@ -291,10 +292,19 @@ export const handler = router({
           heroImageUrl = null;
         }
       }
+      if (settings?.logoImagePath) {
+        try {
+          const [{ url }] = await storage.url([settings.logoImagePath]);
+          logoImageUrl = url;
+        } catch {
+          logoImageUrl = null;
+        }
+      }
       return json({
         orgName: settings?.orgName || "KGGA LMS",
         tagline: settings?.tagline || "Empowering Girls Through Digital Learning, Leadership and Innovation.",
         logoText: settings?.logoText || "KG",
+        logoImageUrl,
         certOrgName: settings?.certOrgName || "KENYA GIRL GUIDES ASSOCIATION",
         heroImageUrl,
       });
@@ -326,6 +336,22 @@ export const handler = router({
       const [{ url }] = await storage.url([path]);
       await writeAudit(ctx.user!.userId, me.name, "UPDATE_HERO_IMAGE", "site", "Updated homepage image");
       return json({ success: true, heroImageUrl: url });
+    },
+  ],
+
+  "POST /api/settings/logo-image": [
+    requireAuth(),
+    async (ctx) => {
+      const me = await requireProfile(ctx);
+      if (!me || !isSuper(me.role)) return error("Only the Super Administrator can change the site logo", 403);
+      const body = ctx.body as { contentBase64: string; contentType: string };
+      const path = `site/logo-${Date.now()}`;
+      const [ok] = await storage.write([{ path, content: body.contentBase64, contentType: body.contentType }]);
+      if (!ok) return error("Upload failed", 500);
+      await saveSettings({ logoImagePath: path });
+      const [{ url }] = await storage.url([path]);
+      await writeAudit(ctx.user!.userId, me.name, "UPDATE_LOGO_IMAGE", "site", "Updated site logo");
+      return json({ success: true, logoImageUrl: url });
     },
   ],
 
