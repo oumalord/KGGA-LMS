@@ -1,4 +1,6 @@
-import { router, json, error, db, storage, secrets, requireAuth } from "@appdeploy/sdk";
+import { router, json, error, secrets, requireAuth } from "@appdeploy/sdk";
+import { db } from "./neonDb";
+import { storage } from "./neonStorage";
 
 // ---------- helpers ----------
 
@@ -800,6 +802,23 @@ export const handler = router({
       const [id] = await db.add("events", [record]);
       await writeAudit(ctx.user!.userId, me.name, "CREATE_EVENT", record.title, "Event created");
       return json({ id, event: { id, ...record } });
+    },
+  ],
+
+  "DELETE /api/events/:id": [
+    requireAuth(),
+    async (ctx) => {
+      const me = await requireProfile(ctx);
+      if (!me) return error("Forbidden", 403);
+      const eventId = ctx.params.id;
+      const [event] = await db.get<any>("events", [eventId]);
+      if (!event) return error("Event not found", 404);
+      if (event.createdBy !== me.authUserId && !isSuper(me.role)) return error("Only the appointment owner can delete it", 403);
+      const { items: registrations } = await db.list<any>("event_registrations", { filter: { eventId }, limit: 500 });
+      if (registrations.length > 0) await db.delete("event_registrations", registrations.map((registration) => registration.id));
+      await db.delete("events", [eventId]);
+      await writeAudit(ctx.user!.userId, me.name, "DELETE_EVENT", event.title, "Deleted appointment");
+      return json({ success: true });
     },
   ],
 

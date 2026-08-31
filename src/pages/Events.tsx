@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "@appdeploy/client";
-import { Plus, CalendarDays, MapPin, X, CheckCircle2, Users } from "lucide-react";
+import { Plus, CalendarDays, MapPin, X, CheckCircle2, Users, Trash2 } from "lucide-react";
 import type { KEvent, Profile, EventRegistration } from "../types";
 
 export default function Events({ profile }: { profile: Profile }) {
@@ -45,6 +45,13 @@ export default function Events({ profile }: { profile: Profile }) {
     }
   }
 
+  async function removeEvent(event: KEvent) {
+    if (!window.confirm(`Delete "${event.title}"? This will also remove its attendance registrations.`)) return;
+    await api.delete(`/api/events/${event.id}`);
+    if (managingEvent?.id === event.id) setManagingEvent(null);
+    load();
+  }
+
   const registeredIds = new Set(myRegs.map((r) => r.eventId));
 
   return (
@@ -73,7 +80,14 @@ export default function Events({ profile }: { profile: Profile }) {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {events.map((ev) => (
             <div key={ev.id} className="bg-white rounded-2xl p-5 border border-gray-50 shadow-sm">
-              <span className="text-[11px] font-semibold text-[#0057B8] bg-[#0057B8]/10 px-2.5 py-1 rounded-full">{ev.type}</span>
+              <div className="flex items-start justify-between gap-3">
+                <span className="text-[11px] font-semibold text-[#0057B8] bg-[#0057B8]/10 px-2.5 py-1 rounded-full">{ev.type}</span>
+                {(ev.createdBy === profile.authUserId || profile.role === "superadmin") && (
+                  <button onClick={() => removeEvent(ev)} className="text-gray-300 hover:text-red-500 p-1" title="Delete appointment" aria-label={`Delete ${ev.title}`}>
+                    <Trash2 size={16} />
+                  </button>
+                )}
+              </div>
               <p className="font-bold text-gray-900 mt-3 mb-1">{ev.title}</p>
               <p className="text-xs text-gray-500 mb-3 line-clamp-2">{ev.description}</p>
               <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">

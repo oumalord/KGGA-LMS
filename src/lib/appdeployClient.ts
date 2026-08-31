@@ -632,6 +632,10 @@ export const api: ApiClient = {
     return { data: {} as T };
   },
   delete: async <T = unknown>(url: string) => {
+    if (url.includes("/api/events/")) {
+      return { data: { success: true } as T };
+    }
+
     if (url.includes("/api/users/")) {
       const userId = url.split("/api/users/")[1];
       const nextUsers = getStoredUsers().filter((user: any) => user.id !== userId);
