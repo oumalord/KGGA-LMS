@@ -109,10 +109,13 @@ function App() {
   }
 
   useEffect(() => {
+    void loadSettings();
     (async () => {
-      await loadSettings();
       if (auth.isSignedIn()) {
-        await loadProfile();
+        await Promise.race([
+          loadProfile(),
+          new Promise<void>((resolve) => window.setTimeout(resolve, 1_500)),
+        ]);
       }
       setChecking(false);
     })();
