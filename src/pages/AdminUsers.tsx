@@ -27,6 +27,15 @@ export default function AdminUsers({ profile }: { profile: Profile }) {
   const adminCount = users.filter((u) => u.role === "admin").length;
   const adminCapReached = adminCount >= 3;
 
+  function openInvite() {
+    setInviteName("");
+    setInviteEmail("");
+    setInvitePassword("");
+    setInviteRole("trainer");
+    setError("");
+    setShowInvite(true);
+  }
+
   function load() {
     api.get("/api/users").then((r) => setUsers(r.data.users));
     api.get("/api/audit-log").then((r) => setLogs(r.data.logs));
@@ -74,7 +83,7 @@ export default function AdminUsers({ profile }: { profile: Profile }) {
             Admins {adminCount}/3
           </div>
           <button
-            onClick={() => setShowInvite(true)}
+            onClick={openInvite}
             className="flex items-center gap-2 bg-[#0057B8] text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:brightness-110 shadow-md"
           >
             <UserPlus size={16} /> Add Staff
@@ -169,27 +178,33 @@ export default function AdminUsers({ profile }: { profile: Profile }) {
 
       {showInvite && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+          <form autoComplete="off" onSubmit={(event) => { event.preventDefault(); invite(); }} className="bg-white rounded-2xl p-6 w-full max-w-sm">
             <div className="flex items-center justify-between mb-4">
               <p className="font-bold text-lg text-gray-900">Add Staff Account</p>
-              <button onClick={() => setShowInvite(false)}>
+              <button type="button" onClick={() => setShowInvite(false)}>
                 <X size={20} className="text-gray-400" />
               </button>
             </div>
             <input
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-3 text-sm"
               placeholder="Full name"
+              name="staff-invite-name"
+              autoComplete="off"
               value={inviteName}
               onChange={(e) => setInviteName(e.target.value)}
             />
             <input
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-3 text-sm"
               placeholder="Email address"
+              name="staff-invite-email"
+              autoComplete="off"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
             />
             <input
               type="password"
+              name="staff-invite-password"
+              autoComplete="new-password"
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-3 text-sm"
               placeholder="Set a password"
               value={invitePassword}
@@ -206,12 +221,12 @@ export default function AdminUsers({ profile }: { profile: Profile }) {
               </option>
             </select>
             <p className="text-[11px] text-gray-400 mb-4">
-              They'll get full access the moment they sign in to KGGA LMS with this email address via Google.
+              They can sign in immediately with this email address and the password set above.
             </p>
-            <button onClick={invite} className="w-full bg-[#FFD700] text-[#0057B8] font-bold py-2.5 rounded-xl hover:brightness-95">
+            <button type="submit" className="w-full bg-[#FFD700] text-[#0057B8] font-bold py-2.5 rounded-xl hover:brightness-95">
               Create Account
             </button>
-          </div>
+          </form>
         </div>
       )}
     </div>

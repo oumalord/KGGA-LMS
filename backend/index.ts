@@ -1,6 +1,7 @@
 import { router, json, error, secrets, requireAuth } from "./runtime.js";
 import { db } from "./neonDb.js";
 import { storage } from "./neonStorage.js";
+import bcrypt from "bcryptjs";
 
 // ---------- helpers ----------
 
@@ -19,6 +20,7 @@ interface UserRecord {
   guidingUnit?: string;
   category?: string;
   gender?: string;
+  passwordHash?: string;
 }
 
 const MAX_ADMINS = 3;
@@ -193,8 +195,8 @@ export const handler = router({
     async (ctx) => {
       const me = await requireProfile(ctx);
       if (!me || !isSuper(me.role)) return error("Only the Super Administrator can create Administrator or Tutor accounts", 403);
-      const body = ctx.body as { name: string; email: string; role: "admin" | "trainer" };
-      if (!body.name?.trim() || !body.email?.trim()) return error("Name and email are required", 400);
+      const body = ctx.body as { name: string; email: string; role: "admin" | "trainer"; password: string };
+      if (!body.name?.trim() || !body.email?.trim() || !body.password) return error("Name, email, and password are required", 400);
       if (!["admin", "trainer"].includes(body.role)) return error("Invalid role", 400);
       const { items: existing } = await db.list<UserRecord>("users", { filter: { email: body.email.trim() } });
       if (existing.length > 0) return error("A user with this email already exists", 400);
@@ -206,15 +208,17 @@ export const handler = router({
       }
       const record: UserRecord = {
         authUserId: `invite-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        email: body.email.trim(),
+        email: body.email.trim().toLowerCase(),
         name: body.name.trim(),
         role: body.role,
         status: "active",
         createdAt: Date.now(),
+        passwordHash: await bcrypt.hash(body.password, 12),
       };
       const [id] = await db.add("users", [record]);
       await writeAudit(ctx.user!.userId, me.name, "INVITE_STAFF", record.email, `Invited as ${body.role}`);
-      return json({ id, staff: { id, ...record } });
+      const user = { id, ...record, passwordHash: undefined };
+      return json({ id, user, staff: user });
     },
   ],
 
