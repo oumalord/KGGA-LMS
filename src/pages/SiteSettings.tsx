@@ -12,9 +12,11 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
+  const [templateUploading, setTemplateUploading] = useState(false);
   const [saved, setSaved] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const logoFileRef = useRef<HTMLInputElement>(null);
+  const templateFileRef = useRef<HTMLInputElement>(null);
 
   async function save() {
     setSaving(true);
@@ -51,6 +53,28 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
       await api.post("/api/settings/logo-image", { contentBase64: base64, contentType: file.type || "image/png" });
       setLogoUploading(false);
       onUpdated();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function handleCertificateTemplateUpload(file: File) {
+    setTemplateUploading(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const base64 = (reader.result as string).split(",")[1];
+        const response = await api.post("/api/resources", {
+          title: "Default certificate template",
+          category: "Certificate Templates",
+          contentBase64: base64,
+          contentType: file.type || "image/png",
+          fileName: file.name,
+        });
+        await api.put("/api/settings", { certificateTemplateResourceId: response.data.id });
+        onUpdated();
+      } finally {
+        setTemplateUploading(false);
+      }
     };
     reader.readAsDataURL(file);
   }
@@ -94,6 +118,15 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-50 shadow-sm p-6">
+        <div className="mb-6 rounded-2xl border border-gray-100 bg-gray-50 p-4">
+          <p className="text-sm font-bold text-gray-900 mb-1">Default Certificate Template</p>
+          <p className="text-xs text-gray-500 mb-3">Upload a landscape image used for learners' certificates when their course has no custom template.</p>
+          <label className="inline-flex items-center gap-2 text-xs font-semibold bg-[#0057B8] text-white px-3 py-2 rounded-lg cursor-pointer hover:brightness-110">
+            {templateUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+            {templateUploading ? "Uploading..." : "Upload Template"}
+            <input ref={templateFileRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleCertificateTemplateUpload(e.target.files[0])} />
+          </label>
+        </div>
         <p className="font-bold text-gray-900 mb-4">Branding & Text</p>
 
         <div className="mb-5 rounded-2xl border border-gray-100 bg-gray-50 p-4">

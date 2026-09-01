@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/neonClient";
-import { Plus, BookOpen, X, Trash2, Tag, Type, Youtube, HardDrive, Upload, Loader2 } from "lucide-react";
+import { Plus, BookOpen, X, Trash2, Tag, Type, Youtube, HardDrive, Upload, Loader2, ImageIcon } from "lucide-react";
 import type { Course, Profile } from "../types";
 
 interface Props {
@@ -40,6 +40,22 @@ function newLesson(title = "", type = "video"): DraftLesson {
   return { id: `l${Date.now()}${Math.random().toString(36).slice(2, 6)}`, title, type, contentSource: "text", contentText: "", youtubeUrl: "", driveUrl: "" };
 }
 
+function CourseCover({ course }: { course: Course }) {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!course.coverResourceId) return setUrl(null);
+    api.get(`/api/resources/${course.coverResourceId}/url`).then((response) => setUrl(response.data.url)).catch(() => setUrl(null));
+  }, [course.coverResourceId]);
+
+  return (
+    <div className="h-24 relative overflow-hidden" style={{ background: course.coverColor }}>
+      {url ? <img src={url} alt="" className="absolute inset-0 h-full w-full object-cover" /> : <BookOpen className="absolute left-5 top-1/2 -translate-y-1/2 text-white/90" size={28} />}
+      {url && <div className="absolute inset-0 bg-black/20" />}
+    </div>
+  );
+}
+
 export default function Courses({ profile, onOpenCourse }: Props) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +65,11 @@ export default function Courses({ profile, onOpenCourse }: Props) {
   const [category, setCategory] = useState("Leadership");
   const [isPaid, setIsPaid] = useState(false);
   const [price, setPrice] = useState("500");
+  const [coverResourceId, setCoverResourceId] = useState<string | null>(null);
+  const [coverName, setCoverName] = useState("");
+  const [coverUploading, setCoverUploading] = useState(false);
   const [lessons, setLessons] = useState<DraftLesson[]>([newLesson("Welcome & Orientation", "video"), newLesson("Course Handbook", "document")]);
+  const coverFileRef = useRef<HTMLInputElement>(null);
   const canCreate = ["trainer", "coordinator", "admin", "superadmin"].includes(profile.role);
 
   function addLesson() {
@@ -79,6 +99,21 @@ export default function Courses({ profile, onOpenCourse }: Props) {
     reader.readAsDataURL(file);
   }
 
+  async function handleCoverUpload(file: File) {
+    setCoverUploading(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const response = await api.post("/api/resources", { title: `${title || "Course"} cover image`, category: "Course Covers", contentBase64: (reader.result as string).split(",")[1], contentType: file.type || "image/jpeg", fileName: file.name });
+        setCoverResourceId(response.data.id);
+        setCoverName(file.name);
+      } finally {
+        setCoverUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
   function load() {
     setLoading(true);
     api.get("/api/courses").then((r) => setCourses(r.data.courses)).finally(() => setLoading(false));
@@ -96,6 +131,7 @@ export default function Courses({ profile, onOpenCourse }: Props) {
       isPaid,
       price: isPaid ? Number(price) || 0 : 0,
       coverColor: COLORS[Math.floor(Math.random() * COLORS.length)],
+      coverResourceId,
       modules: [
         {
           id: "m1",
@@ -118,6 +154,8 @@ export default function Courses({ profile, onOpenCourse }: Props) {
     setDescription("");
     setIsPaid(false);
     setPrice("500");
+    setCoverResourceId(null);
+    setCoverName("");
     setLessons([newLesson("Welcome & Orientation", "video"), newLesson("Course Handbook", "document")]);
     setShowForm(false);
     load();
@@ -160,9 +198,7 @@ export default function Courses({ profile, onOpenCourse }: Props) {
               className="bg-white rounded-2xl overflow-hidden shadow-[0_6px_24px_rgba(0,0,0,0.06)] border border-gray-50 hover:-translate-y-1 transition-transform cursor-pointer group"
               onClick={() => onOpenCourse(c.id)}
             >
-              <div className="h-24 flex items-center px-5" style={{ background: c.coverColor }}>
-                <BookOpen className="text-white/90" size={28} />
-              </div>
+              <CourseCover course={c} />
               <div className="p-5">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="text-[11px] font-semibold text-[#0057B8] bg-[#0057B8]/10 px-2.5 py-1 rounded-full">
@@ -228,6 +264,12 @@ export default function Courses({ profile, onOpenCourse }: Props) {
               <option>Mentorship</option>
               <option>Community Engagement</option>
             </select>
+
+            <label className="flex items-center gap-2 border border-dashed border-gray-300 rounded-xl px-4 py-3 mb-4 text-sm text-gray-600 cursor-pointer hover:bg-gray-50">
+              {coverUploading ? <Loader2 size={16} className="animate-spin text-[#0057B8]" /> : <ImageIcon size={16} className="text-[#0057B8]" />}
+              {coverUploading ? "Uploading cover..." : coverName || "Upload course background photo"}
+              <input ref={coverFileRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleCoverUpload(e.target.files[0])} />
+            </label>
 
             <div className="flex items-center gap-3 mb-4">
               <label className="flex items-center gap-2 text-sm text-gray-700">

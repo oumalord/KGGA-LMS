@@ -11,7 +11,8 @@ export default function Resources({ profile }: { profile: Profile }) {
   const [category, setCategory] = useState("All");
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const isStaff = profile.role === "admin" || profile.role === "superadmin";
+  const canUpload = ["trainer", "coordinator", "admin", "superadmin"].includes(profile.role);
+  const canDelete = profile.role === "admin" || profile.role === "superadmin";
 
   function load() {
     api.get("/api/resources").then((r) => setResources(r.data.resources));
@@ -60,10 +61,10 @@ export default function Resources({ profile }: { profile: Profile }) {
           <h1 className="text-2xl font-extrabold text-gray-900">Resource Center</h1>
           <p className="text-gray-500 text-sm mt-1">Handbooks, policies, guides, templates & training materials.</p>
         </div>
-        <label className="flex items-center gap-2 bg-[#0057B8] text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:brightness-110 shadow-md cursor-pointer">
+        {canUpload && <label className="flex items-center gap-2 bg-[#0057B8] text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:brightness-110 shadow-md cursor-pointer">
           <Upload size={16} /> {uploading ? "Uploading..." : "Upload File"}
           <input ref={fileRef} type="file" className="hidden" onChange={handleFile} disabled={uploading} />
-        </label>
+        </label>}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -106,7 +107,7 @@ export default function Resources({ profile }: { profile: Profile }) {
                 <button onClick={() => download(r.id)} className="flex-1 flex items-center justify-center gap-1.5 text-xs bg-gray-50 hover:bg-gray-100 py-2 rounded-lg font-medium text-gray-700">
                   <Download size={13} /> Download
                 </button>
-                {isStaff && (
+                {canDelete && (
                   <button onClick={() => remove(r.id)} className="px-2.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50">
                     <Trash2 size={14} />
                   </button>

@@ -315,6 +315,7 @@ export const handler = router({
         logoImageUrl,
         certOrgName: settings?.certOrgName || "KENYA GIRL GUIDES ASSOCIATION",
         heroImageUrl,
+        certificateTemplateResourceId: settings?.certificateTemplateResourceId || null,
       });
     },
   ],
@@ -407,6 +408,7 @@ export const handler = router({
         trainerName: me.name,
         published: true,
         coverColor: body.coverColor ?? "#0057B8",
+        coverResourceId: body.coverResourceId ?? null,
         isPaid: !!body.isPaid,
         price: body.isPaid ? Number(body.price) || 0 : 0,
         certificateTemplate: body.certificateTemplate ?? {
@@ -590,6 +592,7 @@ export const handler = router({
       if (justCompleted) {
         const { items: existingCerts } = await db.list("certificates", { filter: { courseId, userId: me.authUserId } });
         if (existingCerts.length === 0) {
+          const siteSettings = await getSettings();
           const certRecord = {
             userId: me.authUserId,
             userName: me.name,
@@ -600,6 +603,7 @@ export const handler = router({
             trainerName: course.trainerName,
             message: course.certificateTemplate?.message ?? "has successfully completed",
             signatureLabel: course.certificateTemplate?.signatureLabel ?? "Trainer",
+            backgroundResourceId: course.certificateTemplate?.backgroundResourceId ?? siteSettings?.certificateTemplateResourceId ?? null,
           };
           const [certId] = await db.add("certificates", [certRecord]);
           certificate = { id: certId, ...certRecord };
@@ -948,7 +952,7 @@ export const handler = router({
     requireAuth(),
     async (ctx) => {
       const me = await requireProfile(ctx);
-      if (!me) return error("Forbidden", 403);
+      if (!me || !isCourseCreator(me.role)) return error("Only tutors, coordinators, or administrators can upload resources", 403);
       const body = ctx.body as { title: string; category: string; contentBase64: string; contentType: string; fileName: string };
       const path = `resources/${Date.now()}-${body.fileName}`;
       const [ok] = await storage.write([{ path, content: body.contentBase64, contentType: body.contentType }]);

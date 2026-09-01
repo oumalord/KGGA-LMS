@@ -27,6 +27,7 @@ const DEFAULT_SETTINGS: SiteSettingsType = {
   logoImageUrl: null,
   certOrgName: "KENYA GIRL GUIDES ASSOCIATION",
   heroImageUrl: null,
+  certificateTemplateResourceId: null,
 };
 
 const SETTINGS_CACHE_KEY = "kgga-lms-public-settings";
@@ -66,6 +67,7 @@ function App() {
         logoImageUrl: payload.logoImageUrl || null,
         certOrgName: payload.certOrgName,
         heroImageUrl: payload.heroImageUrl || null,
+        certificateTemplateResourceId: payload.certificateTemplateResourceId || null,
       };
       window.localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(nextSettings));
       setSettings(nextSettings);

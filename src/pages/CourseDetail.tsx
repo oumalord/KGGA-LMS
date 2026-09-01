@@ -24,6 +24,7 @@ export default function CourseDetail({ courseId, profile, onBack }: Props) {
   const [surveyComments, setSurveyComments] = useState("");
   const [surveySubmitted, setSurveySubmitted] = useState(false);
   const [expandedLesson, setExpandedLesson] = useState<string | null>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
 
   async function load() {
     const cr = await api.get(`/api/courses/${courseId}`);
@@ -39,6 +40,11 @@ export default function CourseDetail({ courseId, profile, onBack }: Props) {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
+
+  useEffect(() => {
+    if (!course?.coverResourceId) return setCoverUrl(null);
+    api.get(`/api/resources/${course.coverResourceId}/url`).then((response) => setCoverUrl(response.data.url)).catch(() => setCoverUrl(null));
+  }, [course?.coverResourceId]);
 
   async function enroll() {
     await api.post(`/api/courses/${courseId}/enroll`, {});
@@ -95,11 +101,15 @@ export default function CourseDetail({ courseId, profile, onBack }: Props) {
         <ArrowLeft size={16} /> Back to Courses
       </button>
 
-      <div className="rounded-2xl p-8 text-white mb-6" style={{ background: course.coverColor }}>
+      <div className="relative overflow-hidden rounded-2xl p-8 text-white mb-6" style={{ background: course.coverColor }}>
+        {coverUrl && <img src={coverUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />}
+        {coverUrl && <div className="absolute inset-0 bg-black/45" />}
+        <div className="relative">
         <span className="text-[11px] font-semibold bg-white/20 px-2.5 py-1 rounded-full">{course.category}</span>
         <h1 className="text-2xl font-extrabold mt-3">{course.title}</h1>
         <p className="text-white/85 text-sm mt-2 max-w-xl">{course.description}</p>
         <p className="text-white/70 text-xs mt-3">Facilitated by {course.trainerName} · {totalLessons} lessons</p>
+        </div>
       </div>
 
       {justEarned && (

@@ -45,6 +45,7 @@ export interface Course {
   trainerName: string;
   published: boolean;
   coverColor: string;
+  coverResourceId?: string | null;
   isPaid: boolean;
   price: number;
   certificateTemplate: { message: string; signatureLabel: string; backgroundResourceId?: string | null };
@@ -185,6 +186,7 @@ export interface SiteSettings {
   logoImageUrl: string | null;
   certOrgName: string;
   heroImageUrl: string | null;
+  certificateTemplateResourceId?: string | null;
 }
 
 export type Page =
