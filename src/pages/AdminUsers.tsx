@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "@appdeploy/client";
+import { api } from "../lib/neonClient";
 import { ShieldCheck, Ban, Trash2, ScrollText, Crown, UserPlus, X, BookOpen } from "lucide-react";
 import type { Profile, AuditLogEntry } from "../types";
 

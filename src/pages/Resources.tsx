@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "@appdeploy/client";
+import { api } from "../lib/neonClient";
 import { Upload, FileText, Download, Trash2, Search } from "lucide-react";
 import type { Profile, Resource } from "../types";
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "@appdeploy/client";
+import { api } from "../lib/neonClient";
 import { Users2, Award, CheckCircle2, UserPlus, Trash2, X, GraduationCap } from "lucide-react";
 import type { Course, Profile } from "../types";
 

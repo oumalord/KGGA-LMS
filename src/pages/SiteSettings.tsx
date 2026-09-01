@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { api } from "@appdeploy/client";
+import { api } from "../lib/neonClient";
 import { Palette, Upload, Loader2, Save, ImageIcon } from "lucide-react";
 import type { SiteSettings as SiteSettingsType } from "../types";
 

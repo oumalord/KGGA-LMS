@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "@appdeploy/client";
+import { api } from "../lib/neonClient";
 import { Plus, CalendarDays, MapPin, X, CheckCircle2, Users, Trash2 } from "lucide-react";
 import type { KEvent, Profile, EventRegistration } from "../types";
 

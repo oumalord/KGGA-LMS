@@ -51,7 +51,7 @@ function normalizeRecord(id: string, record: unknown): RecordWithId {
 }
 
 export const db = {
-  async list<T extends RecordWithId = RecordWithId>(
+  async list<T = RecordWithId>(
     collection: string,
     options: { filter?: Record<string, unknown>; limit?: number } = {},
   ) {
@@ -65,7 +65,7 @@ export const db = {
     return { items: rows.map((row) => normalizeRecord(row.id as string, row.record) as T) };
   },
 
-  async get<T extends RecordWithId = RecordWithId>(collection: string, ids: string[]) {
+  async get<T = RecordWithId>(collection: string, ids: string[]) {
     await ensureSchema();
     const table = tableFor(collection);
     const rows = await sql.query(`SELECT id::text, record FROM ${table} WHERE id = ANY($1::uuid[])`, [ids]);
@@ -73,7 +73,7 @@ export const db = {
     return ids.map((id) => recordsById.get(id) ?? null);
   },
 
-  async add(collection: string, records: Record<string, unknown>[]) {
+  async add(collection: string, records: object[]) {
     await ensureSchema();
     const table = tableFor(collection);
     const ids: string[] = [];
@@ -84,7 +84,7 @@ export const db = {
     return ids;
   },
 
-  async update(collection: string, updates: { id: string; record: Record<string, unknown> }[]) {
+  async update(collection: string, updates: { id: string; record: object }[]) {
     await ensureSchema();
     const table = tableFor(collection);
     const updated: boolean[] = [];

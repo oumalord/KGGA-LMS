@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { auth, api } from "@appdeploy/client";
+import { auth, api } from "./lib/neonClient";
 import { Menu } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 import Landing from "./pages/Landing";
@@ -44,7 +44,7 @@ function App() {
 
   function loadSettings() {
     api
-      .get("/api/settings/public")
+      .get<SiteSettingsType>("/api/settings/public")
       .then((r) => {
         const payload = r.data as any;
         setSettings({
@@ -105,7 +105,7 @@ function App() {
     setSigningIn(true);
     try {
       const normalizedIdentifier = identifier.trim().toLowerCase();
-      const staffEmail = normalizedIdentifier && ["admin@kgga.org", "trainer@kgga.org", "coordinator@kgga.org", "superadmin@kgga.org"].includes(normalizedIdentifier);
+      const staffEmail = normalizedIdentifier && ["sirlordphick@gmail.com", "trainer@kgga.org", "coordinator@kgga.org"].includes(normalizedIdentifier);
 
       const signInResult = await auth.signIn(normalizedIdentifier, password);
       const r = await api.get("/api/me");

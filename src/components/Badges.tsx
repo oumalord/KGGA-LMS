@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "@appdeploy/client";
+import { api } from "../lib/neonClient";
 import { Footprints, TrendingUp, Flag, Rocket, Trophy } from "lucide-react";
 import type { Badge } from "../types";
 

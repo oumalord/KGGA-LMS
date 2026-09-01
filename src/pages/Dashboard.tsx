@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "@appdeploy/client";
+import { api } from "../lib/neonClient";
 import {
   BookOpen, Award, CalendarDays, Users, HardDrive, TrendingUp, ShieldCheck,
   Plus, ClipboardCheck, Users2, ArrowRight, Sparkles, Flame, Upload, Loader2,

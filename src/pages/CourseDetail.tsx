@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "@appdeploy/client";
+import { api } from "../lib/neonClient";
 import { ArrowLeft, CheckCircle2, Circle, PlayCircle, FileText, Video, Award, Sparkles, Lock, Star, ChevronDown, ChevronUp, HardDrive, Download } from "lucide-react";
 import type { Course, Enrollment, Profile, Badge } from "../types";
 

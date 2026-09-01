@@ -15,10 +15,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
-        "baseUrl": ".",
-        "paths": {
-            "@appdeploy/client": ["src/lib/appdeployClient.ts"]
-        }
+        "baseUrl": "."
     },
     "include": ["src"]
 }

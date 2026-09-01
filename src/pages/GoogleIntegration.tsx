@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "@appdeploy/client";
+import { api } from "../lib/neonClient";
 import { Cloud, FileSpreadsheet, Calendar, Video, CheckCircle2, AlertTriangle } from "lucide-react";
 
 export default function GoogleIntegration() {
@@ -30,7 +30,7 @@ export default function GoogleIntegration() {
           <p className="font-semibold mb-1">Setup required</p>
           <p>
             Full Drive/Calendar/Meet integration needs KGGA's own Google Cloud project credentials (OAuth client +
-            API keys with the relevant scopes). Ask your Anthropic/AppDeploy admin to add them as app secrets, then
+            API keys with the relevant scopes). Configure those credentials as environment secrets on the API server, then
             this panel will show "Connected" automatically. In the meantime, files can be stored securely in the
             LMS's built-in Resource Center.
           </p>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link2, Loader2, Plus, Trash2, Upload, Video } from "lucide-react";
-import { api } from "@appdeploy/client";
+import { api } from "../lib/neonClient";
 import type { KGGAVideo, Profile } from "../types";
 
 export default function KGGAVideos({ profile }: { profile: Profile }) {

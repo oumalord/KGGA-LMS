@@ -1,4 +1,4 @@
-import { router, json, error, secrets, requireAuth } from "@appdeploy/sdk";
+import { router, json, error, secrets, requireAuth } from "./runtime";
 import { db } from "./neonDb";
 import { storage } from "./neonStorage";
 
