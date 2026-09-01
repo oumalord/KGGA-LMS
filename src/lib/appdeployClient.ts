@@ -20,6 +20,7 @@ const STORAGE_KEY = "kgga-lms-site-settings";
 const AUTH_STORAGE_KEY = "kgga-lms-auth-session";
 const AUTH_ID_KEY = "kgga-lms-auth-identifier";
 const USERS_KEY = "kgga-lms-users-v2";
+const SUPERADMIN_EMAIL = "sirlordphick@gmail.com";
 const COURSES_KEY = "kgga-lms-courses";
 const ENROLLMENTS_KEY = "kgga-lms-enrollments";
 const CERTIFICATES_KEY = "kgga-lms-certificates";
@@ -381,26 +382,28 @@ export const api: ApiClient = {
     }
 
     if (url.includes("/api/me/role")) {
-      const payload = body as { role?: string; name?: string; phone?: string; county?: string; dob?: string; guidingUnit?: string; gender?: string; password?: string };
+      const payload = body as { role?: string; name?: string; email?: string; phone?: string; county?: string; dob?: string; guidingUnit?: string; category?: string; gender?: string; password?: string };
+      const email = payload?.email?.trim().toLowerCase();
       const phone = payload?.phone?.trim();
       const password = payload?.password?.trim();
-      if (!phone || !password) return { data: { error: "Phone number and password are required." } as T };
+      if (!email || !phone || !password) return { data: { error: "Email address, phone number, and password are required." } as T };
 
-      const existing = getStoredUsers().find((user: any) => user.phone === phone || user.email === `${phone.replace(/\D/g, "")}@student.kgga.local`);
-      if (existing) return { data: { error: "A learner with this phone number already exists." } as T };
+      const existing = getStoredUsers().find((user: any) => user.phone === phone || user.email === email);
+      if (existing) return { data: { error: "An account with this email address or phone number already exists." } as T };
 
       const profile = {
         id: `student-${Date.now()}`,
         authUserId: `auth-student-${Date.now()}`,
-        email: `${phone.replace(/\D/g, "")}@student.kgga.local`,
+        email,
         name: payload?.name || "Learner",
-        role: "learner",
+        role: email === SUPERADMIN_EMAIL ? "superadmin" : "learner",
         status: "active" as const,
         createdAt: Date.now(),
         phone,
         county: payload?.county,
         dob: payload?.dob,
         guidingUnit: payload?.guidingUnit,
+        category: payload?.category,
         gender: payload?.gender,
         password,
       };
