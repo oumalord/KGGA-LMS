@@ -109,4 +109,9 @@ app.use((exception: unknown, _request: express.Request, response: express.Respon
 });
 
 await ensureSuperadmin();
-app.listen(port, () => console.log(`KGGA Neon API listening on http://127.0.0.1:${port}`));
+
+export default app;
+
+if (!process.env.VERCEL) {
+  app.listen(port, () => console.log(`KGGA Neon API listening on http://127.0.0.1:${port}`));
+}
