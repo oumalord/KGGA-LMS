@@ -45,6 +45,7 @@ function App() {
   const [signingIn, setSigningIn] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [needsRoleSelection, setNeedsRoleSelection] = useState(false);
+  const [registrationRequested, setRegistrationRequested] = useState(false);
   const [roleError, setRoleError] = useState<string | null>(null);
   const [page, setPage] = useState<Page>("dashboard");
   const [activeCourseId, setActiveCourseId] = useState<string | null>(null);
@@ -96,9 +97,11 @@ function App() {
     try {
       const registration = await api.post<any>("/api/me/role", { role: "learner", ...details });
       const registeredProfile = registration.data.profile;
-      await auth.signIn(details.email, details.password);
+      const signInResult = await auth.signIn(details.email, details.password);
+      if (!signInResult.profile) return "Your account was created, but automatic sign-in failed. Please sign in with your email and password.";
       setProfile(registeredProfile);
       setNeedsRoleSelection(false);
+      setRegistrationRequested(false);
       setPage(registeredProfile.role === "learner" ? "courses" : "dashboard");
       setAutoOpenStudentLogin(false);
       setStudentLoginHint(null);
@@ -182,7 +185,7 @@ function App() {
     );
   }
 
-  if (needsRoleSelection) {
+  if (needsRoleSelection || registrationRequested) {
     return <RoleSelect onSelect={handleRoleSelect} initialError={roleError} settings={settings} />;
   }
 
@@ -196,6 +199,7 @@ function App() {
         autoOpenStudentLogin={autoOpenStudentLogin}
         studentNotice={studentLoginHint}
         signInError={signInError}
+        onRegister={() => setRegistrationRequested(true)}
         onStudentLoginDismissed={() => setAutoOpenStudentLogin(false)}
       />
     );

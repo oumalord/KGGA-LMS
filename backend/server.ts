@@ -74,12 +74,14 @@ app.post("/api/auth/login", async (request, response, next) => {
 
 app.post("/api/auth/register", async (request, response, next) => {
   try {
-    const body = request.body as { name?: string; phone?: string; password?: string; county?: string; dob?: string; guidingUnit?: string; gender?: string };
-    if (!body.name?.trim() || !body.phone?.trim() || !body.password) throw new ApiError(400, "Name, phone number, and password are required.");
+    const body = request.body as { name?: string; email?: string; phone?: string; password?: string; county?: string; dob?: string; guidingUnit?: string; category?: string; gender?: string };
+    if (!body.name?.trim() || !body.email?.trim() || !body.phone?.trim() || !body.password) throw new ApiError(400, "Name, email address, phone number, and password are required.");
     const { items } = await db.list<any>("users", { limit: 1000 });
+    const email = body.email.trim().toLowerCase();
     if (items.some((user) => user.phone === body.phone.trim())) throw new ApiError(409, "A learner with this phone number already exists.");
+    if (items.some((user) => user.email?.toLowerCase() === email)) throw new ApiError(409, "An account with this email address already exists.");
     const authUserId = `auth-${randomUUID()}`;
-    const profile = { authUserId, email: `${body.phone.replace(/\D/g, "")}@student.kgga.local`, name: body.name.trim(), role: "learner", status: "active", createdAt: Date.now(), phone: body.phone.trim(), county: body.county ?? "", dob: body.dob ?? "", guidingUnit: body.guidingUnit ?? "", gender: body.gender ?? "", passwordHash: await bcrypt.hash(body.password, 12) };
+    const profile = { authUserId, email, name: body.name.trim(), role: "learner", status: "active", createdAt: Date.now(), phone: body.phone.trim(), county: body.county ?? "", dob: body.dob ?? "", guidingUnit: body.guidingUnit ?? "", category: body.category ?? "", gender: body.gender ?? "", passwordHash: await bcrypt.hash(body.password, 12) };
     const [id] = await db.add("users", [profile]);
     response.status(201).json({ profile: { id, ...profile, passwordHash: undefined } });
   } catch (exception) {

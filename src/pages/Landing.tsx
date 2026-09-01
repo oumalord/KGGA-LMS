@@ -16,6 +16,7 @@ interface Props {
   autoOpenStudentLogin?: boolean;
   studentNotice?: string | null;
   signInError?: string | null;
+  onRegister: () => void;
   onStudentLoginDismissed?: () => void;
 }
 
@@ -30,7 +31,7 @@ interface PublicCourse {
   lessonCount: number;
 }
 
-export default function Landing({ onSignIn, signingIn, settings, heroFallback, autoOpenStudentLogin, studentNotice, signInError, onStudentLoginDismissed }: Props) {
+export default function Landing({ onSignIn, signingIn, settings, heroFallback, autoOpenStudentLogin, studentNotice, signInError, onRegister, onStudentLoginDismissed }: Props) {
   const [courses, setCourses] = useState<PublicCourse[]>([]);
   const [videos, setVideos] = useState<KGGAVideo[]>([]);
   const [showLoginCard, setShowLoginCard] = useState(false);
@@ -119,12 +120,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
               Log In
             </button>
             <button
-              onClick={() => {
-                setIsStudentMode(true);
-                setIdentifier("");
-                setPassword("");
-                setShowLoginCard(true);
-              }}
+              onClick={onRegister}
               disabled={signingIn}
               className="bg-[#FFD700] text-[#071633] px-4 py-2 rounded-lg font-bold text-sm hover:brightness-95 transition-all disabled:opacity-60"
             >
