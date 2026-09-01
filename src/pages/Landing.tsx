@@ -137,7 +137,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             <form onSubmit={submitLogin} className="space-y-4">
               <label className="block text-xs font-semibold text-gray-500">
                 {isStudentMode ? "Phone number" : "Email address"}
-                <input name="kgga-login-identifier" autoComplete="off" value={identifier} onChange={(e) => setIdentifier(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" placeholder={isStudentMode ? "07XX XXX XXX" : "admin@kgga.org"} />
+                <input name="kgga-login-identifier" autoComplete="off" value={identifier} onChange={(e) => setIdentifier(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" placeholder={isStudentMode ? "07XX XXX XXX" : "name@example.org"} />
               </label>
               <label className="block text-xs font-semibold text-gray-500">
                 Password

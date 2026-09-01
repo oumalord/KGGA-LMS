@@ -105,7 +105,6 @@ function App() {
     setSigningIn(true);
     try {
       const normalizedIdentifier = identifier.trim().toLowerCase();
-      const staffEmail = normalizedIdentifier && ["admin@kgga.org", "trainer@kgga.org", "coordinator@kgga.org", "superadmin@kgga.org"].includes(normalizedIdentifier);
 
       const signInResult = await auth.signIn(normalizedIdentifier, password);
       const r = await api.get("/api/me");
@@ -117,9 +116,6 @@ function App() {
         setPage(payload.profile.role === "learner" ? "courses" : "dashboard");
         setStudentLoginHint(null);
         setAutoOpenStudentLogin(false);
-      } else if (staffEmail && !password.trim()) {
-        setRoleError("Please enter your password to continue.");
-        setNeedsRoleSelection(false);
       } else {
         setNeedsRoleSelection(true);
       }

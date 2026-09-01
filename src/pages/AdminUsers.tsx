@@ -19,6 +19,7 @@ export default function AdminUsers({ profile }: { profile: Profile }) {
   const [showInvite, setShowInvite] = useState(false);
   const [inviteName, setInviteName] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
+  const [invitePassword, setInvitePassword] = useState("");
   const [inviteRole, setInviteRole] = useState<"admin" | "trainer">("trainer");
   const [inviteNotice, setInviteNotice] = useState("");
 
@@ -35,13 +36,14 @@ export default function AdminUsers({ profile }: { profile: Profile }) {
   async function invite() {
     setError("");
     setInviteNotice("");
-    if (!inviteName.trim() || !inviteEmail.trim()) return;
+    if (!inviteName.trim() || !inviteEmail.trim() || !invitePassword.trim()) return;
     try {
-      const r = await api.post("/api/staff/invite", { name: inviteName, email: inviteEmail, role: inviteRole });
+      const r = await api.post("/api/staff/invite", { name: inviteName, email: inviteEmail, role: inviteRole, password: invitePassword });
       setInviteName("");
       setInviteEmail("");
+      setInvitePassword("");
       setShowInvite(false);
-      setInviteNotice(`Credentials created for ${r.data.user.name}. Email: ${r.data.credentials.email} · Password: ${r.data.credentials.password}`);
+      setInviteNotice(`Account created for ${r.data.user.name}.`);
       load();
     } catch (e: any) {
       setError(e?.response?.data?.error || "Could not create the account.");
@@ -185,6 +187,13 @@ export default function AdminUsers({ profile }: { profile: Profile }) {
               placeholder="Email address"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-3 text-sm"
+              placeholder="Set a password"
+              value={invitePassword}
+              onChange={(e) => setInvitePassword(e.target.value)}
             />
             <select
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 text-sm"

@@ -19,63 +19,13 @@ const DEFAULT_SETTINGS = {
 const STORAGE_KEY = "kgga-lms-site-settings";
 const AUTH_STORAGE_KEY = "kgga-lms-auth-session";
 const AUTH_ID_KEY = "kgga-lms-auth-identifier";
-const USERS_KEY = "kgga-lms-users";
+const USERS_KEY = "kgga-lms-users-v2";
 const COURSES_KEY = "kgga-lms-courses";
 const ENROLLMENTS_KEY = "kgga-lms-enrollments";
 const CERTIFICATES_KEY = "kgga-lms-certificates";
 const RESOURCES_KEY = "kgga-lms-resources";
 const VIDEOS_KEY = "kgga-lms-videos";
 const SUBMISSIONS_KEY = "kgga-lms-submissions";
-
-const DEFAULT_USERS = [
-  {
-    id: "superadmin-1",
-    authUserId: "auth-superadmin-1",
-    email: "superadmin@kgga.org",
-    name: "KGGA Admin",
-    role: "superadmin",
-    status: "active" as const,
-    createdAt: Date.now(),
-    password: "kgga123",
-  },
-  {
-    id: "admin-1",
-    authUserId: "auth-admin-1",
-    email: "admin@kgga.org",
-    name: "KGGA Admin",
-    role: "superadmin",
-    status: "active" as const,
-    createdAt: Date.now(),
-    password: "kgga123",
-  },
-  {
-    id: "trainer-1",
-    authUserId: "auth-trainer-1",
-    email: "trainer@kgga.org",
-    name: "KGGA Trainer",
-    role: "trainer",
-    status: "active" as const,
-    createdAt: Date.now(),
-    password: "kgga123",
-  },
-  {
-    id: "coordinator-1",
-    authUserId: "auth-coordinator-1",
-    email: "coordinator@kgga.org",
-    name: "KGGA Coordinator",
-    role: "coordinator",
-    status: "active" as const,
-    createdAt: Date.now(),
-    password: "kgga123",
-  },
-] as const;
-
-const MOCK_STAFF_PROFILES = {
-  "superadmin@kgga.org": DEFAULT_USERS[0],
-  "admin@kgga.org": DEFAULT_USERS[1],
-  "trainer@kgga.org": DEFAULT_USERS[2],
-  "coordinator@kgga.org": DEFAULT_USERS[3],
-} as const;
 
 const MOCK_DASHBOARD_STATS = {
   totalLearners: 128,
@@ -138,17 +88,11 @@ function writeStorageJson<T>(key: string, value: T) {
 }
 
 function getStoredUsers() {
-  return readStorageJson(USERS_KEY, [...DEFAULT_USERS] as any[]);
+  return readStorageJson(USERS_KEY, [] as any[]);
 }
 
 function writeStoredUsers(users: any[]) {
   writeStorageJson(USERS_KEY, users);
-}
-
-function getProfileForEmail(email?: string | null) {
-  const normalizedEmail = email?.trim().toLowerCase();
-  if (!normalizedEmail) return null;
-  return (MOCK_STAFF_PROFILES as Record<string, any>)[normalizedEmail] ?? null;
 }
 
 function getUserByIdentifier(identifier?: string | null) {
@@ -466,12 +410,14 @@ export const api: ApiClient = {
     }
 
     if (url.includes("/api/staff/invite")) {
-      const payload = body as { name?: string; email?: string; role?: string };
+      const payload = body as { name?: string; email?: string; role?: string; password?: string };
+      const password = payload?.password?.trim();
       const incomingRole = payload?.role === "admin" ? "admin" : "trainer";
       const adminCount = getStoredUsers().filter((user: any) => user.role === "admin").length;
       if (incomingRole === "admin" && adminCount >= 3) {
         return { data: { error: "Administrator capacity has been reached." } as T };
       }
+      if (!password) return { data: { error: "A password is required." } as T };
 
       const user = {
         id: `staff-${Date.now()}`,
@@ -481,11 +427,11 @@ export const api: ApiClient = {
         role: incomingRole,
         status: "active" as const,
         createdAt: Date.now(),
-        password: "kgga123",
+        password,
       };
       const nextUsers = [...getStoredUsers(), user];
       writeStoredUsers(nextUsers);
-      return { data: { success: true, user, credentials: { email: user.email, password: user.password } } as T };
+      return { data: { success: true, user } as T };
     }
 
     if (url.includes("/api/resources")) {
