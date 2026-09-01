@@ -3,9 +3,9 @@ import bcrypt from "bcryptjs";
 import express from "express";
 import jwt from "jsonwebtoken";
 import { randomUUID } from "node:crypto";
-import { handler } from "./index";
-import { db } from "./neonDb";
-import { ApiError } from "./runtime";
+import { handler } from "./index.js";
+import { db } from "./neonDb.js";
+import { ApiError } from "./runtime.js";
 
 const port = Number(process.env.API_PORT ?? 3001);
 const jwtSecret = process.env.AUTH_JWT_SECRET;
