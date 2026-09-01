@@ -15,6 +15,7 @@ interface Props {
   heroFallback: string;
   autoOpenStudentLogin?: boolean;
   studentNotice?: string | null;
+  signInError?: string | null;
   onStudentLoginDismissed?: () => void;
 }
 
@@ -29,7 +30,7 @@ interface PublicCourse {
   lessonCount: number;
 }
 
-export default function Landing({ onSignIn, signingIn, settings, heroFallback, autoOpenStudentLogin, studentNotice, onStudentLoginDismissed }: Props) {
+export default function Landing({ onSignIn, signingIn, settings, heroFallback, autoOpenStudentLogin, studentNotice, signInError, onStudentLoginDismissed }: Props) {
   const [courses, setCourses] = useState<PublicCourse[]>([]);
   const [videos, setVideos] = useState<KGGAVideo[]>([]);
   const [showLoginCard, setShowLoginCard] = useState(false);
@@ -153,7 +154,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
                 Password
                 <input name="kgga-login-password" autoComplete="new-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" placeholder="Enter password" />
               </label>
-              {loginError && <p className="text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">{loginError}</p>}
+              {(loginError || signInError) && <p className="text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">{loginError || signInError}</p>}
               <div className="flex flex-col gap-2 pt-1">
                 <button type="submit" disabled={signingIn} className="w-full bg-[#0057B8] text-white px-4 py-3 rounded-xl font-bold text-sm hover:brightness-110 disabled:opacity-60">
                   {signingIn ? "Signing in…" : (isStudentMode ? "Access Student Dashboard" : "Access Dashboard")}

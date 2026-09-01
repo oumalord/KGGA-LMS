@@ -41,6 +41,7 @@ function App() {
   const [settings, setSettings] = useState<SiteSettingsType>(DEFAULT_SETTINGS);
   const [studentLoginHint, setStudentLoginHint] = useState<string | null>(null);
   const [autoOpenStudentLogin, setAutoOpenStudentLogin] = useState(false);
+  const [signInError, setSignInError] = useState<string | null>(null);
 
   function loadSettings() {
     api
@@ -116,6 +117,7 @@ function App() {
 
   async function handleSignIn(identifier = "", password = "") {
     setSigningIn(true);
+    setSignInError(null);
     try {
       const normalizedIdentifier = identifier.trim().toLowerCase();
 
@@ -140,8 +142,8 @@ function App() {
         setStudentLoginHint(null);
         setAutoOpenStudentLogin(false);
       }
-    } catch {
-      setRoleError("Unable to sign in right now. Please try again.");
+    } catch (error: any) {
+      setSignInError(error?.response?.data?.error || "Unable to sign in right now. Please try again.");
     } finally {
       setSigningIn(false);
     }
@@ -179,6 +181,7 @@ function App() {
         heroFallback={heroImageDataUrl}
         autoOpenStudentLogin={autoOpenStudentLogin}
         studentNotice={studentLoginHint}
+        signInError={signInError}
         onStudentLoginDismissed={() => setAutoOpenStudentLogin(false)}
       />
     );
