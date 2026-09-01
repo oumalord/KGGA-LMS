@@ -29,6 +29,17 @@ const DEFAULT_SETTINGS: SiteSettingsType = {
   heroImageUrl: null,
 };
 
+const SETTINGS_CACHE_KEY = "kgga-lms-public-settings";
+
+function getCachedSettings(): SiteSettingsType {
+  try {
+    const cached = window.localStorage.getItem(SETTINGS_CACHE_KEY);
+    return cached ? { ...DEFAULT_SETTINGS, ...JSON.parse(cached) } : DEFAULT_SETTINGS;
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
 function App() {
   const [checking, setChecking] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
@@ -38,26 +49,26 @@ function App() {
   const [page, setPage] = useState<Page>("dashboard");
   const [activeCourseId, setActiveCourseId] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [settings, setSettings] = useState<SiteSettingsType>(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState<SiteSettingsType>(getCachedSettings);
   const [studentLoginHint, setStudentLoginHint] = useState<string | null>(null);
   const [autoOpenStudentLogin, setAutoOpenStudentLogin] = useState(false);
   const [signInError, setSignInError] = useState<string | null>(null);
 
-  function loadSettings() {
-    api
-      .get<SiteSettingsType>("/api/settings/public")
-      .then((r) => {
-        const payload = r.data as any;
-        setSettings({
-          orgName: payload.orgName,
-          tagline: payload.tagline,
-          logoText: payload.logoText,
-          logoImageUrl: payload.logoImageUrl || null,
-          certOrgName: payload.certOrgName,
-          heroImageUrl: payload.heroImageUrl || null,
-        });
-      })
-      .catch(() => {});
+  async function loadSettings() {
+    try {
+      const r = await api.get<SiteSettingsType>("/api/settings/public");
+      const payload = r.data as any;
+      const nextSettings = {
+        orgName: payload.orgName,
+        tagline: payload.tagline,
+        logoText: payload.logoText,
+        logoImageUrl: payload.logoImageUrl || null,
+        certOrgName: payload.certOrgName,
+        heroImageUrl: payload.heroImageUrl || null,
+      };
+      window.localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(nextSettings));
+      setSettings(nextSettings);
+    } catch {}
   }
 
   async function loadProfile() {
@@ -98,8 +109,8 @@ function App() {
   }
 
   useEffect(() => {
-    loadSettings();
     (async () => {
+      await loadSettings();
       if (auth.isSignedIn()) {
         await loadProfile();
       }
