@@ -1,20 +1,66 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/neonClient";
-import { Award, X, Download } from "lucide-react";
-import type { Certificate, SiteSettings } from "../types";
+import { Award, X, Download, Upload, Loader2, ImageIcon } from "lucide-react";
+import type { Certificate, Profile, SiteSettings } from "../types";
 
-export default function Certificates({ settings }: { settings: SiteSettings }) {
+export default function Certificates({ settings, profile, onUpdated }: { settings: SiteSettings; profile: Profile; onUpdated: () => void }) {
   const [certs, setCerts] = useState<Certificate[]>([]);
   const [selected, setSelected] = useState<Certificate | null>(null);
+  const [uploadingTemplate, setUploadingTemplate] = useState(false);
+  const [templateNotice, setTemplateNotice] = useState("");
+  const templateInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     api.get("/api/my/certificates").then((r) => setCerts(r.data.certificates));
   }, []);
 
+  async function uploadTemplate(file: File) {
+    setUploadingTemplate(true);
+    setTemplateNotice("");
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const response = await api.post("/api/resources", {
+          title: "Default certificate template",
+          category: "Certificate Templates",
+          contentBase64: (reader.result as string).split(",")[1],
+          contentType: file.type || "image/png",
+          fileName: file.name,
+        });
+        await api.put("/api/settings", { certificateTemplateResourceId: response.data.id });
+        onUpdated();
+        setTemplateNotice("Template saved. It will be used for certificates issued from now on.");
+      } catch (error: any) {
+        setTemplateNotice(error?.response?.data?.error || "The template could not be uploaded.");
+      } finally {
+        setUploadingTemplate(false);
+        if (templateInputRef.current) templateInputRef.current.value = "";
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-extrabold text-gray-900 mb-1">My Certificates</h1>
       <p className="text-gray-500 text-sm mb-6">Every certificate includes a QR code for instant verification.</p>
+
+      {profile.role === "superadmin" && (
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#0057B8]/10 flex items-center justify-center shrink-0"><ImageIcon size={18} className="text-[#0057B8]" /></div>
+              <div><p className="font-bold text-gray-900 text-sm">Default Certificate Template</p><p className="text-xs text-gray-500 mt-1">Upload a landscape PNG or JPG background for future learner certificates.</p></div>
+            </div>
+            <label className="inline-flex items-center justify-center gap-2 bg-[#0057B8] text-white px-4 py-2.5 rounded-xl font-semibold text-sm cursor-pointer hover:brightness-110 shrink-0">
+              {uploadingTemplate ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
+              {uploadingTemplate ? "Uploading..." : "Upload Template"}
+              <input ref={templateInputRef} type="file" accept="image/png,image/jpeg" className="hidden" disabled={uploadingTemplate} onChange={(event) => event.target.files?.[0] && uploadTemplate(event.target.files[0])} />
+            </label>
+          </div>
+          {templateNotice && <p className={`mt-3 text-xs ${templateNotice.startsWith("Template saved") ? "text-green-700" : "text-red-600"}`}>{templateNotice}</p>}
+        </div>
+      )}
 
       {certs.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 text-center border border-gray-100">

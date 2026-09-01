@@ -242,7 +242,7 @@ function App() {
           {page === "course-detail" && activeCourseId && (
             <CourseDetail courseId={activeCourseId} profile={profile} onBack={() => setPage("courses")} />
           )}
-          {page === "certificates" && <Certificates settings={settings} />}
+          {page === "certificates" && <Certificates settings={settings} profile={profile} onUpdated={loadSettings} />}
           {page === "events" && <Events profile={profile} />}
           {page === "resources" && <Resources profile={profile} />}
           {page === "students" && isCourseManager && <MyStudents profile={profile} />}
