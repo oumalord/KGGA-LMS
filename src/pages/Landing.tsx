@@ -40,8 +40,18 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
   const heroSrc = settings.heroImageUrl || heroFallback;
 
   useEffect(() => {
-    api.get("/api/public/courses").then((r) => setCourses(r.data.courses)).catch(() => {});
-    api.get("/api/public/videos").then((r) => setVideos(r.data.videos ?? [])).catch(() => {});
+    function loadPublicContent() {
+      api.get("/api/public/courses").then((r) => setCourses(r.data.courses)).catch(() => {});
+      api.get("/api/public/videos").then((r) => setVideos(r.data.videos ?? [])).catch(() => {});
+    }
+
+    loadPublicContent();
+    const intervalId = window.setInterval(loadPublicContent, 30_000);
+    window.addEventListener("focus", loadPublicContent);
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", loadPublicContent);
+    };
   }, []);
 
   useEffect(() => {
