@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/[...path].ts": {
+      "includeFiles": "backend/**"
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/[...path]" },
     { "source": "/(.*)", "destination": "/index.html" }
