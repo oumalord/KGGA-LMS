@@ -17,10 +17,16 @@ interface UserRecord {
   county?: string;
   dob?: string;
   guidingUnit?: string;
+  category?: string;
   gender?: string;
 }
 
 const MAX_ADMINS = 3;
+const SUPERADMIN_EMAIL = "sirlordphick@gmail.com";
+
+function isConfiguredSuperAdmin(email?: string) {
+  return email?.trim().toLowerCase() === SUPERADMIN_EMAIL;
+}
 
 async function getUserByAuthId(authUserId: string) {
   const { items } = await db.list<UserRecord>("users", { filter: { authUserId } });
@@ -115,7 +121,7 @@ export const handler = router({
           }
         }
         const { items: anyUsers } = await db.list("users", { limit: 1 });
-        if (anyUsers.length === 0) {
+        if (anyUsers.length === 0 || isConfiguredSuperAdmin(u.email)) {
           const record: UserRecord = {
             authUserId: u.userId,
             email: u.email ?? "",
@@ -148,21 +154,21 @@ export const handler = router({
         county?: string;
         dob?: string;
         guidingUnit?: string;
+        category?: string;
         gender?: string;
       };
-      // Public self-registration only ever creates Learner (Student) accounts.
-      // Administrator and Tutor accounts are created by the Super Administrator.
       const record: UserRecord = {
         authUserId: u.userId,
         email: u.email ?? "",
         name: (body.name?.trim() || u.name || u.email || "Guide Member") as string,
-        role: "learner",
+        role: isConfiguredSuperAdmin(u.email) ? "superadmin" : "learner",
         status: "active",
         createdAt: Date.now(),
         phone: body.phone ?? "",
         county: body.county ?? "",
         dob: body.dob ?? "",
         guidingUnit: body.guidingUnit ?? "",
+        category: body.category ?? "",
         gender: body.gender ?? "",
       };
       const [id] = await db.add("users", [record]);

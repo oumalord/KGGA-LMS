@@ -72,19 +72,24 @@ function App() {
 
   async function handleRoleSelect(details: {
     name: string;
+    email: string;
     phone: string;
     county: string;
     dob: string;
     guidingUnit: string;
+    category: string;
     gender: string;
     password: string;
   }): Promise<string | null> {
     try {
-      await api.post("/api/me/role", { role: "learner", ...details });
-      setProfile(null);
+      const registration = await api.post<any>("/api/me/role", { role: "learner", ...details });
+      const registeredProfile = registration.data.profile;
+      await auth.signIn(details.email, details.password);
+      setProfile(registeredProfile);
       setNeedsRoleSelection(false);
-      setAutoOpenStudentLogin(true);
-      setStudentLoginHint(`Registration complete. Sign in with ${details.phone} and your chosen password.`);
+      setPage(registeredProfile.role === "learner" ? "courses" : "dashboard");
+      setAutoOpenStudentLogin(false);
+      setStudentLoginHint(null);
       return null;
     } catch (e: any) {
       return e?.response?.data?.error || "Something went wrong. Please try again.";
@@ -105,7 +110,6 @@ function App() {
     setSigningIn(true);
     try {
       const normalizedIdentifier = identifier.trim().toLowerCase();
-      const staffEmail = normalizedIdentifier && ["sirlordphick@gmail.com", "trainer@kgga.org", "coordinator@kgga.org"].includes(normalizedIdentifier);
 
       const signInResult = await auth.signIn(normalizedIdentifier, password);
       const r = await api.get("/api/me");
@@ -117,9 +121,6 @@ function App() {
         setPage(payload.profile.role === "learner" ? "courses" : "dashboard");
         setStudentLoginHint(null);
         setAutoOpenStudentLogin(false);
-      } else if (staffEmail && !password.trim()) {
-        setRoleError("Please enter your password to continue.");
-        setNeedsRoleSelection(false);
       } else {
         setNeedsRoleSelection(true);
       }

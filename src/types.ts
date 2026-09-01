@@ -12,6 +12,7 @@ export interface Profile {
   county?: string;
   dob?: string;
   guidingUnit?: string;
+  category?: string;
   gender?: string;
 }
 

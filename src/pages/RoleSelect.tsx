@@ -4,10 +4,12 @@ import type { SiteSettings } from "../types";
 
 interface RegistrationDetails {
   name: string;
+  email: string;
   phone: string;
   county: string;
   dob: string;
   guidingUnit: string;
+  category: string;
   gender: string;
   password: string;
 }
@@ -22,13 +24,17 @@ const COUNTIES = [
   "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Kiambu", "Machakos", "Kajiado", "Uasin Gishu",
   "Meru", "Kilifi", "Kakamega", "Bungoma", "Nyeri", "Kisii", "Trans Nzoia", "Other",
 ];
+const GUIDING_UNITS = ["Brownie Pack", "Guide Company", "Ranger Unit", "Young Leader Unit", "Adult Leader Unit", "Volunteer Unit", "Other"];
+const MEMBERSHIP_CATEGORIES = ["Brownie", "Guide", "Ranger", "Young Leader", "Adult Leader", "Volunteer"];
 
 export default function RoleSelect({ onSelect, initialError, settings }: Props) {
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [county, setCounty] = useState("Nairobi");
   const [dob, setDob] = useState("");
-  const [guidingUnit, setGuidingUnit] = useState("");
+  const [guidingUnit, setGuidingUnit] = useState(GUIDING_UNITS[0]);
+  const [category, setCategory] = useState(MEMBERSHIP_CATEGORIES[0]);
   const [gender, setGender] = useState("Female");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -37,12 +43,12 @@ export default function RoleSelect({ onSelect, initialError, settings }: Props) 
   async function confirm() {
     setSubmitting(true);
     setError("");
-    if (!name.trim() || !phone.trim() || !password.trim()) {
-      setError("Please enter your full name, phone number, and a password to complete registration.");
+    if (!name.trim() || !email.trim() || !phone.trim() || !password.trim()) {
+      setError("Please enter your full name, email address, phone number, and a password to complete registration.");
       setSubmitting(false);
       return;
     }
-    const err = await onSelect({ name, phone, county, dob, guidingUnit, gender, password });
+    const err = await onSelect({ name, email, phone, county, dob, guidingUnit, category, gender, password });
     if (err) setError(err);
     setSubmitting(false);
   }
@@ -71,6 +77,10 @@ export default function RoleSelect({ onSelect, initialError, settings }: Props) 
               <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Full name</label>
               <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jane Wanjiru" />
             </div>
+            <div className="sm:col-span-2">
+              <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Email address</label>
+              <input type="email" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.org" />
+            </div>
             <div>
               <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Phone number</label>
               <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07XX XXX XXX" />
@@ -95,13 +105,21 @@ export default function RoleSelect({ onSelect, initialError, settings }: Props) 
                 <option>Prefer not to say</option>
               </select>
             </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Membership category</label>
+              <select className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={category} onChange={(e) => setCategory(e.target.value)}>
+                {MEMBERSHIP_CATEGORIES.map((option) => <option key={option}>{option}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Guiding unit</label>
+              <select className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={guidingUnit} onChange={(e) => setGuidingUnit(e.target.value)}>
+                {GUIDING_UNITS.map((option) => <option key={option}>{option}</option>)}
+              </select>
+            </div>
             <div className="sm:col-span-2">
               <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Choose a password</label>
               <input type="password" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter a secure password" />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Guiding unit / troop (optional)</label>
-              <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={guidingUnit} onChange={(e) => setGuidingUnit(e.target.value)} placeholder="e.g. Westlands Rangers" />
             </div>
           </div>
 
