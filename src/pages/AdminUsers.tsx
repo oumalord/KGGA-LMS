@@ -52,7 +52,7 @@ export default function AdminUsers({ profile }: { profile: Profile }) {
       setInviteEmail("");
       setInvitePassword("");
       setShowInvite(false);
-      setInviteNotice(`Account created for ${r.data.user.name}.`);
+      setInviteNotice(`${r.data.updated ? "Account updated" : "Account created"} for ${r.data.user.name}. They can now sign in with this email and password.`);
       load();
     } catch (e: any) {
       setError(e?.response?.data?.error || "Could not create the account.");

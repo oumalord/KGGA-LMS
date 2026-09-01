@@ -198,8 +198,17 @@ export const handler = router({
       const body = ctx.body as { name: string; email: string; role: "admin" | "trainer"; password: string };
       if (!body.name?.trim() || !body.email?.trim() || !body.password) return error("Name, email, and password are required", 400);
       if (!["admin", "trainer"].includes(body.role)) return error("Invalid role", 400);
-      const { items: existing } = await db.list<UserRecord>("users", { filter: { email: body.email.trim() } });
-      if (existing.length > 0) return error("A user with this email already exists", 400);
+      const email = body.email.trim().toLowerCase();
+      const { items: existing } = await db.list<UserRecord>("users", { filter: { email } });
+      const existingUser = existing[0];
+      if (existingUser) {
+        if (existingUser.role === "superadmin") return error("The Super Administrator account cannot be changed here", 400);
+        const updated = { ...existingUser, name: body.name.trim(), email, role: body.role, status: "active" as const, passwordHash: await bcrypt.hash(body.password, 12) };
+        await db.update("users", [{ id: existingUser.id, record: updated }]);
+        await writeAudit(ctx.user!.userId, me.name, "RESET_STAFF_PASSWORD", email, `Updated ${body.role} account`);
+        const user = { id: existingUser.id, ...updated, passwordHash: undefined };
+        return json({ id: existingUser.id, user, staff: user, updated: true });
+      }
       if (body.role === "admin") {
         const { items: admins } = await db.list<UserRecord>("users", { filter: { role: "admin" }, limit: 50 });
         if (admins.length >= MAX_ADMINS) {
@@ -208,7 +217,7 @@ export const handler = router({
       }
       const record: UserRecord = {
         authUserId: `invite-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        email: body.email.trim().toLowerCase(),
+        email,
         name: body.name.trim(),
         role: body.role,
         status: "active",

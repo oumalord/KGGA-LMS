@@ -31,11 +31,13 @@ export const auth = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ identifier, password }),
     });
+    const result = await response.json().catch(() => ({}));
     if (!response.ok) {
       window.localStorage.removeItem(SESSION_KEY);
-      return { profile: null };
+      const error: any = new Error(result.error || "Invalid email or password.");
+      error.response = { data: result };
+      throw error;
     }
-    const result = await response.json();
     window.localStorage.setItem(SESSION_KEY, result.token);
     return { profile: result.profile };
   },

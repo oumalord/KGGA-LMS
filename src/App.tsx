@@ -141,6 +141,7 @@ function App() {
       const normalizedIdentifier = identifier.trim().toLowerCase();
 
       const signInResult = await auth.signIn(normalizedIdentifier, password);
+      if (!signInResult.profile) return;
       const r = await api.get("/api/me");
       const payload = r.data as any;
 
