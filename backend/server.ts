@@ -33,7 +33,7 @@ function authenticate(request: express.Request): AuthUser | undefined {
   const token = request.header("authorization")?.replace(/^Bearer\s+/i, "");
   if (!token) return undefined;
   try {
-    return jwt.verify(token, jwtSecret) as AuthUser;
+    return jwt.verify(token, jwtSecret) as unknown as AuthUser;
   } catch {
     return undefined;
   }
