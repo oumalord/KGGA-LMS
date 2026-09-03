@@ -203,7 +203,7 @@ export const handler = router({
       const existingUser = existing[0];
       if (existingUser) {
         if (existingUser.role === "superadmin") return error("The Super Administrator account cannot be changed here", 400);
-        const updated = { ...existingUser, name: body.name.trim(), email, role: body.role, status: "active" as const, passwordHash: await bcrypt.hash(body.password, 12) };
+        const updated = { ...existingUser, name: body.name.trim(), email, role: body.role, status: "active" as const, passwordHash: await bcrypt.hash(body.password, 12), mustChangePassword: true };
         await db.update("users", [{ id: existingUser.id, record: updated }]);
         await writeAudit(ctx.user!.userId, me.name, "RESET_STAFF_PASSWORD", email, `Updated ${body.role} account`);
         const user = { id: existingUser.id, ...updated, passwordHash: undefined };
@@ -223,11 +223,25 @@ export const handler = router({
         status: "active",
         createdAt: Date.now(),
         passwordHash: await bcrypt.hash(body.password, 12),
+        mustChangePassword: true,
       };
       const [id] = await db.add("users", [record]);
       await writeAudit(ctx.user!.userId, me.name, "INVITE_STAFF", record.email, `Invited as ${body.role}`);
       const user = { id, ...record, passwordHash: undefined };
       return json({ id, user, staff: user });
+    },
+  ],
+
+  "POST /api/me/password": [
+    requireAuth(),
+    async (ctx) => {
+      const me = await requireProfile(ctx);
+      const body = ctx.body as { password?: string };
+      if (!me) return error("Forbidden", 403);
+      if (!body.password || body.password.length < 8) return error("Your new password must contain at least 8 characters", 400);
+      await db.update("users", [{ id: (me as any).id, record: { ...me, passwordHash: await bcrypt.hash(body.password, 12), mustChangePassword: false } }]);
+      await writeAudit(ctx.user!.userId, me.name, "CHANGE_PASSWORD", me.email, "Changed account password");
+      return json({ success: true });
     },
   ],
 

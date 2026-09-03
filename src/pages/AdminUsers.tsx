@@ -23,7 +23,7 @@ export default function AdminUsers({ profile }: { profile: Profile }) {
   const [inviteRole, setInviteRole] = useState<"admin" | "trainer">("trainer");
   const [inviteNotice, setInviteNotice] = useState("");
 
-  const staff = users.filter((u) => u.role === "admin" || u.role === "trainer" || u.role === "superadmin");
+  const staff = users.filter((u) => u.role === "admin" || u.role === "trainer");
   const adminCount = users.filter((u) => u.role === "admin").length;
   const adminCapReached = adminCount >= 3;
 

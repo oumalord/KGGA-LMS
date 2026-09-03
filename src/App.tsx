@@ -175,6 +175,10 @@ function App() {
     setPage("dashboard");
   }
 
+  async function handlePasswordChanged() {
+    await loadProfile();
+  }
+
   function openCourse(id: string) {
     setActiveCourseId(id);
     setPage("course-detail");
@@ -220,6 +224,10 @@ function App() {
         </div>
       </div>
     );
+  }
+
+  if (profile.mustChangePassword) {
+    return <ProfilePage profile={profile} requirePasswordChange onPasswordChanged={handlePasswordChanged} />;
   }
 
   const isSuper = profile.role === "superadmin";

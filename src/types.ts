@@ -8,6 +8,7 @@ export interface Profile {
   role: Role;
   status: "active" | "suspended";
   createdAt: number;
+  mustChangePassword?: boolean;
   phone?: string;
   county?: string;
   dob?: string;
