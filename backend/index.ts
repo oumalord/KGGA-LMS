@@ -1,6 +1,6 @@
-import { router, json, error, secrets, requireAuth } from "./runtime.js";
-import { db } from "./neonDb.js";
-import { storage } from "./neonStorage.js";
+import { router, json, error, secrets, requireAuth } from "./runtime";
+import { db } from "./neonDb";
+import { storage } from "./neonStorage";
 import bcrypt from "bcryptjs";
 
 // ---------- helpers ----------
