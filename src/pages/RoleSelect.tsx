@@ -71,23 +71,23 @@ export default function RoleSelect({ onSelect, initialError, settings }: Props) 
           <p className="text-gray-500">A few details to finish setting up your student account.</p>
         </div>
 
-        <div className="bg-white rounded-3xl border border-black/5 p-8 shadow-sm">
+        <form autoComplete="off" onSubmit={(event) => { event.preventDefault(); void confirm(); }} className="bg-white rounded-3xl border border-black/5 p-8 shadow-sm">
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
               <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Full name</label>
-              <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jane Wanjiru" />
+              <input name="registration-full-name" autoComplete="off" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jane Wanjiru" />
             </div>
             <div className="sm:col-span-2">
               <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Email address</label>
-              <input type="email" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.org" />
+              <input name="registration-email" autoComplete="off" type="email" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.org" />
             </div>
             <div>
               <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Phone number</label>
-              <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07XX XXX XXX" />
+              <input name="registration-phone" autoComplete="off" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07XX XXX XXX" />
             </div>
             <div>
               <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Date of birth</label>
-              <input type="date" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={dob} onChange={(e) => setDob(e.target.value)} />
+              <input name="registration-date-of-birth" autoComplete="off" type="date" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={dob} onChange={(e) => setDob(e.target.value)} />
             </div>
             <div>
               <label className="text-xs font-semibold text-gray-500 mb-1.5 block">County</label>
@@ -119,7 +119,7 @@ export default function RoleSelect({ onSelect, initialError, settings }: Props) 
             </div>
             <div className="sm:col-span-2">
               <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Choose a password</label>
-              <input type="password" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter a secure password" />
+              <input name="registration-password" autoComplete="new-password" type="password" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter a secure password" />
             </div>
           </div>
 
@@ -134,7 +134,7 @@ export default function RoleSelect({ onSelect, initialError, settings }: Props) 
               {submitting ? "Setting up your account…" : "Complete Registration"} <ArrowRight size={16} />
             </button>
           </div>
-        </div>
+        </form>
 
         <p className="text-center text-xs text-gray-400 mt-6">
           Tutor or Administrator? Ask your Super Administrator to add your account.
