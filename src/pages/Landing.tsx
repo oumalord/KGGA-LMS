@@ -169,7 +169,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
         <div className="pointer-events-none absolute top-10 right-0 w-[480px] h-[480px] rounded-full bg-[#0057B8]/30 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 left-10 w-[300px] h-[300px] rounded-full bg-[#FFD700]/10 blur-3xl" />
 
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-16 lg:py-24 grid lg:grid-cols-2 gap-14 items-center">
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-12 sm:py-16 lg:py-24 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           <div>
             <span className="inline-flex items-center gap-1.5 bg-white/10 text-[#FFD700] px-3.5 py-1.5 rounded-full text-[12px] font-semibold mb-6">
               <Sparkles size={12} /> Official Digital Learning Ecosystem
@@ -208,11 +208,11 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
           </div>
 
           {/* Photo */}
-          <div className="relative hidden lg:block">
-            <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/10">
-              <img src={heroSrc} alt="KGGA learners collaborating on a project" className="w-full h-[460px] object-cover object-top" />
+          <div className="relative mt-2 lg:mt-0">
+            <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3] sm:aspect-[16/10] lg:aspect-auto">
+              <img src={heroSrc} alt="KGGA learners collaborating on a project" className="w-full h-full lg:h-[460px] object-cover object-top" />
             </div>
-            <div className="absolute -top-6 -right-6 bg-white rounded-2xl shadow-xl p-4 w-48">
+            <div className="absolute -top-4 right-2 sm:-top-6 sm:-right-6 bg-white rounded-2xl shadow-xl p-3 sm:p-4 w-40 sm:w-48">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-[11px] font-semibold text-gray-500">Your Progress</p>
                 <p className="text-[11px] font-bold text-[#0057B8]">78%</p>
@@ -222,7 +222,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
               </div>
               <p className="text-[10px] text-gray-400 mt-2">You're doing great!</p>
             </div>
-            <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-4 w-56 flex items-center gap-3">
+            <div className="absolute -bottom-4 left-2 sm:-bottom-6 sm:-left-6 bg-white rounded-2xl shadow-xl p-3 sm:p-4 w-52 sm:w-56 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#FFD700]/20 flex items-center justify-center shrink-0">
                 <PlayCircle size={18} className="text-[#c9a300]" />
               </div>
