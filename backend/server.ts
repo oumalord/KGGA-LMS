@@ -29,6 +29,13 @@ async function ensureSuperadmin() {
   await db.add("users", [{ authUserId, email: superadminEmail, name: "Sir Lord Phick", role: "superadmin", status: "active", createdAt: Date.now(), passwordHash }]);
 }
 
+let databaseReady: Promise<void> | undefined;
+
+function ensureDatabaseReady() {
+  databaseReady ??= ensureSuperadmin();
+  return databaseReady;
+}
+
 function authenticate(request: express.Request): AuthUser | undefined {
   const token = request.header("authorization")?.replace(/^Bearer\s+/i, "");
   if (!token) return undefined;
@@ -56,6 +63,16 @@ function matchRoute(method: string, path: string) {
 
 const app = express();
 app.use(express.json({ limit: "50mb" }));
+
+app.use(async (_request, _response, next) => {
+  try {
+    await ensureDatabaseReady();
+    next();
+  } catch (exception) {
+    console.error(exception);
+    next(new ApiError(503, "The LMS database is unavailable. Check DATABASE_URL and the Neon project status."));
+  }
+});
 
 app.post("/api/auth/login", async (request, response, next) => {
   try {
@@ -110,10 +127,9 @@ app.use((exception: unknown, _request: express.Request, response: express.Respon
   response.status(error.status).json({ error: error.message });
 });
 
-await ensureSuperadmin();
-
 export default app;
 
 if (!process.env.VERCEL) {
-  app.listen(port, () => console.log(`KGGA Neon API listening on http://127.0.0.1:${port}`));
+  ensureDatabaseReady()
+    .then(() => app.listen(port, () => console.log(`KGGA Neon API listening on http://127.0.0.1:${port}`)));
 }
