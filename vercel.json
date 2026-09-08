@@ -1,14 +1,8 @@
 {
-  "version": 2,
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "nodejs20.x",
-      "includeFiles": "backend/**"
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.ts"
     }
-  },
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.ts" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
