@@ -359,7 +359,20 @@ export const handler = router({
     async (ctx) => {
       const me = await requireProfile(ctx);
       if (!me || !isSuper(me.role)) return error("Only the Super Administrator can change site settings", 403);
-      const body = ctx.body as { orgName?: string; tagline?: string; logoText?: string; certOrgName?: string };
+      const body = ctx.body as {
+        orgName?: string;
+        tagline?: string;
+        logoText?: string;
+        certOrgName?: string;
+        aboutTitle?: string;
+        aboutText?: string;
+        aboutStats?: { label: string; value: string }[];
+        contactEmail?: string;
+        contactPhone?: string;
+        contactAddress?: string;
+        socialLinks?: { platform: string; url: string }[];
+        certificateTemplateResourceId?: string | null;
+      };
       await saveSettings(body);
       await writeAudit(ctx.user!.userId, me.name, "UPDATE_SETTINGS", "site", "Updated site settings");
       return json({ success: true });

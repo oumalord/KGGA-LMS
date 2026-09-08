@@ -93,8 +93,8 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
           <Palette size={19} className="text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900">Site Settings</h1>
-          <p className="text-gray-500 text-sm">Control the branding across the whole platform — homepage, sidebar, and certificates.</p>
+          <h1 className="text-2xl font-extrabold text-gray-900">Super Administrator Site Settings</h1>
+          <p className="text-gray-500 text-sm">Only the Super Administrator can control homepage branding, About information, contact details, social links, and certificates.</p>
         </div>
       </div>
 
