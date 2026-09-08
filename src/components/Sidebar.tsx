@@ -31,10 +31,12 @@ export default function Sidebar({ page, setPage, profile, onSignOut, mobileOpen,
     items.push({ key: "students", label: "My Students", icon: Users2 });
     items.push({ key: "grading", label: "Grading & Results", icon: ClipboardCheck });
   }
+  if (profile.role === "admin" || profile.role === "superadmin") {
+    items.push({ key: "settings", label: profile.role === "superadmin" ? "Site Settings" : "Site Information", icon: Palette });
+  }
   if (profile.role === "superadmin") {
     items.push({ key: "admin-users", label: "Administrators", icon: ShieldCheck });
     items.push({ key: "google", label: "Google Workspace", icon: Cloud });
-    items.push({ key: "settings", label: "Site Settings", icon: Palette });
     items.push({ key: "kgga-videos", label: "KGGA Videos", icon: Video });
   }
   items.push({ key: "profile", label: "My Profile", icon: User });

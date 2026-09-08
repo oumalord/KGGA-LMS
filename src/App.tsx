@@ -251,6 +251,7 @@ function App() {
   }
 
   const isSuper = profile.role === "superadmin";
+  const canViewSiteSettings = profile.role === "admin" || isSuper;
   const isCourseManager = ["trainer", "coordinator", "admin", "superadmin"].includes(profile.role);
 
   return (
@@ -277,7 +278,7 @@ function App() {
           {page === "grading" && isCourseManager && <Grading profile={profile} settings={settings} />}
           {page === "admin-users" && isSuper && <AdminUsers profile={profile} />}
           {page === "google" && isSuper && <GoogleIntegration />}
-          {page === "settings" && isSuper && <SiteSettings settings={settings} onUpdated={loadSettings} />}
+          {page === "settings" && canViewSiteSettings && <SiteSettings settings={settings} onUpdated={loadSettings} canEdit={isSuper} />}
           {page === "kgga-videos" && isSuper && <KGGAVideos profile={profile} />}
           {page === "profile" && <ProfilePage profile={profile} />}
         </main>

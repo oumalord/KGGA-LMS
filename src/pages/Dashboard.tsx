@@ -89,6 +89,7 @@ export default function Dashboard({
         { key: "courses" as Page, label: "New Course", icon: Plus },
         { key: "students" as Page, label: "My Students", icon: Users2 },
         { key: "grading" as Page, label: "Grading & Results", icon: ClipboardCheck },
+        { key: "settings" as Page, label: "Site Information", icon: Sparkles },
         { key: "events" as Page, label: "Events", icon: CalendarDays },
       ]
     : [

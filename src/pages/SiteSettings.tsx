@@ -3,7 +3,7 @@ import { api } from "../lib/neonClient";
 import { Palette, Upload, Loader2, Save, ImageIcon, Plus, Trash2 } from "lucide-react";
 import type { SiteSettings as SiteSettingsType } from "../types";
 
-export default function SiteSettings({ settings, onUpdated }: { settings: SiteSettingsType; onUpdated: () => void }) {
+export default function SiteSettings({ settings, onUpdated, canEdit = true }: { settings: SiteSettingsType; onUpdated: () => void; canEdit?: boolean }) {
   const [orgName, setOrgName] = useState(settings.orgName);
   const [tagline, setTagline] = useState(settings.tagline);
   const [logoText, setLogoText] = useState(settings.logoText);
@@ -29,6 +29,7 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
     setSaving(true);
     setSaved(false);
     try {
+      if (!canEdit) return;
       await api.put("/api/settings", { orgName, tagline, logoText, logoImageUrl, certOrgName, aboutTitle, aboutText, aboutStats, contactEmail, contactPhone, contactAddress, socialLinks });
       onUpdated();
       setSaved(true);
@@ -93,8 +94,8 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
           <Palette size={19} className="text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900">Super Administrator Site Settings</h1>
-          <p className="text-gray-500 text-sm">Only the Super Administrator can control homepage branding, About information, contact details, social links, and certificates.</p>
+          <h1 className="text-2xl font-extrabold text-gray-900">{canEdit ? "Super Administrator Site Settings" : "Site Information"}</h1>
+          <p className="text-gray-500 text-sm">{canEdit ? "Only the Super Administrator can control homepage branding, About information, contact details, social links, and certificates." : "View the current homepage branding, About information, contact details, social links, and certificates."}</p>
         </div>
       </div>
 
@@ -110,7 +111,7 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
             </div>
           )}
         </div>
-        <label className="inline-flex items-center gap-2 text-sm font-semibold bg-[#0057B8] text-white px-4 py-2.5 rounded-xl cursor-pointer hover:brightness-110">
+        {canEdit && <label className="inline-flex items-center gap-2 text-sm font-semibold bg-[#0057B8] text-white px-4 py-2.5 rounded-xl cursor-pointer hover:brightness-110">
           {uploading ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
           {uploading ? "Uploading…" : "Upload New Image"}
           <input
@@ -120,19 +121,20 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
             className="hidden"
             onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0])}
           />
-        </label>
+        </label>}
         <p className="text-[11px] text-gray-400 mt-2">This photo appears on the homepage hero and dashboard. Use a landscape or portrait photo of KGGA learners for the most professional look.</p>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-50 shadow-sm p-6">
+        <fieldset disabled={!canEdit}>
         <div className="mb-6 rounded-2xl border border-gray-100 bg-gray-50 p-4">
           <p className="text-sm font-bold text-gray-900 mb-1">Default Certificate Template</p>
           <p className="text-xs text-gray-500 mb-3">Upload a landscape image used for learners' certificates when their course has no custom template.</p>
-          <label className="inline-flex items-center gap-2 text-xs font-semibold bg-[#0057B8] text-white px-3 py-2 rounded-lg cursor-pointer hover:brightness-110">
+          {canEdit && <label className="inline-flex items-center gap-2 text-xs font-semibold bg-[#0057B8] text-white px-3 py-2 rounded-lg cursor-pointer hover:brightness-110">
             {templateUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
             {templateUploading ? "Uploading..." : "Upload Template"}
             <input ref={templateFileRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleCertificateTemplateUpload(e.target.files[0])} />
-          </label>
+          </label>}
         </div>
         <p className="font-bold text-gray-900 mb-4">Branding & Text</p>
 
@@ -148,7 +150,7 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
             </div>
             <div className="flex-1">
               <p className="text-sm text-gray-700 font-medium mb-2">Upload a square logo for the site header, sidebar, and certificate previews.</p>
-              <label className="inline-flex items-center gap-2 text-xs font-semibold bg-[#0057B8] text-white px-3 py-2 rounded-lg cursor-pointer hover:brightness-110">
+              {canEdit && <label className="inline-flex items-center gap-2 text-xs font-semibold bg-[#0057B8] text-white px-3 py-2 rounded-lg cursor-pointer hover:brightness-110">
                 {logoUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
                 {logoUploading ? "Uploading…" : "Upload Logo"}
                 <input
@@ -158,19 +160,19 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
                   className="hidden"
                   onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])}
                 />
-              </label>
+              </label>}
             </div>
           </div>
         </div>
 
         <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Organization name</label>
-        <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 text-sm" value={orgName} onChange={(e) => setOrgName(e.target.value)} />
+        <input readOnly={!canEdit} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 text-sm read-only:bg-gray-50" value={orgName} onChange={(e) => setOrgName(e.target.value)} />
 
         <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Homepage tagline</label>
-        <textarea className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 text-sm" rows={2} value={tagline} onChange={(e) => setTagline(e.target.value)} />
+        <textarea readOnly={!canEdit} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 text-sm read-only:bg-gray-50" rows={2} value={tagline} onChange={(e) => setTagline(e.target.value)} />
 
         <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Certificate organization name</label>
-        <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-5 text-sm" value={certOrgName} onChange={(e) => setCertOrgName(e.target.value)} />
+        <input readOnly={!canEdit} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-5 text-sm read-only:bg-gray-50" value={certOrgName} onChange={(e) => setCertOrgName(e.target.value)} />
 
         <div className="border-t border-gray-100 pt-5 mt-2">
           <p className="font-bold text-gray-900 mb-4">About section</p>
@@ -187,7 +189,7 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
               </div>
             ))}
           </div>
-          <button type="button" onClick={() => setAboutStats([...aboutStats, { value: "", label: "" }])} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#0057B8]"><Plus size={14} /> Add statistic</button>
+          {canEdit && <button type="button" onClick={() => setAboutStats([...aboutStats, { value: "", label: "" }])} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#0057B8]"><Plus size={14} /> Add statistic</button>}
         </div>
 
         <div className="border-t border-gray-100 pt-5 mt-5">
@@ -206,10 +208,11 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
               </div>
             ))}
           </div>
-          <button type="button" onClick={() => setSocialLinks([...socialLinks, { platform: "", url: "" }])} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#0057B8]"><Plus size={14} /> Add social link</button>
+          {canEdit && <button type="button" onClick={() => setSocialLinks([...socialLinks, { platform: "", url: "" }])} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#0057B8]"><Plus size={14} /> Add social link</button>}
         </div>
 
         <div className="flex items-center gap-3">
+          {canEdit && (
           <button
             onClick={save}
             disabled={saving}
@@ -217,8 +220,10 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
           >
             <Save size={15} /> {saving ? "Saving…" : "Save Changes"}
           </button>
+          )}
           {saved && <span className="text-sm text-green-600 font-medium">Saved ✓</span>}
         </div>
+        </fieldset>
       </div>
     </div>
   );
