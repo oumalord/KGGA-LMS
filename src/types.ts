@@ -197,6 +197,16 @@ export interface SiteSettings {
   socialLinks?: { platform: string; url: string }[];
 }
 
+export interface Partner {
+  id: string;
+  name: string;
+  websiteUrl?: string;
+  description?: string;
+  logoUrl?: string | null;
+  logoPath?: string | null;
+  createdAt: number;
+}
+
 export type Page =
   | "dashboard"
   | "courses"
@@ -210,4 +220,5 @@ export type Page =
   | "grading"
   | "students"
   | "profile"
-  | "kgga-videos";
+  | "kgga-videos"
+  | "partners";

@@ -17,6 +17,7 @@ import GoogleIntegration from "./pages/GoogleIntegration";
 import SiteSettings from "./pages/SiteSettings";
 import ProfilePage from "./pages/ProfilePage";
 import KGGAVideos from "./pages/KGGAVideos";
+import Partners from "./pages/Partners";
 import type { Page, Profile, SiteSettings as SiteSettingsType } from "./types";
 import { heroImageDataUrl } from "./heroImage";
 
@@ -274,6 +275,7 @@ function App() {
           {page === "certificates" && <Certificates settings={settings} profile={profile} onUpdated={loadSettings} />}
           {page === "events" && <Events profile={profile} />}
           {page === "resources" && <Resources profile={profile} />}
+          {page === "partners" && <Partners profile={profile} />}
           {page === "students" && isCourseManager && <MyStudents profile={profile} />}
           {page === "grading" && isCourseManager && <Grading profile={profile} settings={settings} />}
           {page === "admin-users" && isSuper && <AdminUsers profile={profile} />}

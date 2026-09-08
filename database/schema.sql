@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS events (id UUID PRIMARY KEY DEFAULT gen_random_uuid()
 CREATE TABLE IF NOT EXISTS event_registrations (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), record JSONB NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS resources (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), record JSONB NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS kgga_videos (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), record JSONB NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS partners (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), record JSONB NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS files (path TEXT PRIMARY KEY, content_base64 TEXT NOT NULL, content_type TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 
 CREATE INDEX IF NOT EXISTS users_record_idx ON users USING GIN (record);
@@ -35,6 +36,7 @@ CREATE INDEX IF NOT EXISTS events_record_idx ON events USING GIN (record);
 CREATE INDEX IF NOT EXISTS event_registrations_record_idx ON event_registrations USING GIN (record);
 CREATE INDEX IF NOT EXISTS resources_record_idx ON resources USING GIN (record);
 CREATE INDEX IF NOT EXISTS kgga_videos_record_idx ON kgga_videos USING GIN (record);
+CREATE INDEX IF NOT EXISTS partners_record_idx ON partners USING GIN (record);
 
 CREATE UNIQUE INDEX IF NOT EXISTS users_auth_user_id_unique ON users ((record->>'authUserId'));
 CREATE UNIQUE INDEX IF NOT EXISTS settings_key_unique ON settings ((record->>'key'));

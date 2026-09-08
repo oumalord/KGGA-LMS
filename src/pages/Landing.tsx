@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/neonClient";
 import {
-  BookOpen, Award, Users, ArrowRight, Sparkles,
+  BookOpen, Award, Users, ArrowRight, Sparkles, Building2,
   Star, Clock, PlayCircle, CheckCircle2, Check,
 } from "lucide-react";
 import type { SiteSettings } from "../types";
 import type { KGGAVideo } from "../types";
 import { VideoPreview } from "./KGGAVideos";
+import type { Partner } from "../types";
 
 interface Props {
   onSignIn: (identifier?: string, password?: string) => void;
@@ -34,6 +35,7 @@ interface PublicCourse {
 export default function Landing({ onSignIn, signingIn, settings, heroFallback, autoOpenStudentLogin, studentNotice, signInError, onRegister, onStudentLoginDismissed }: Props) {
   const [courses, setCourses] = useState<PublicCourse[]>([]);
   const [videos, setVideos] = useState<KGGAVideo[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
   const [showLoginCard, setShowLoginCard] = useState(false);
   const [isStudentMode, setIsStudentMode] = useState(false);
   const [identifier, setIdentifier] = useState("");
@@ -45,6 +47,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
     function loadPublicContent() {
       api.get("/api/public/courses").then((r) => setCourses(r.data.courses)).catch(() => {});
       api.get("/api/public/videos").then((r) => setVideos(r.data.videos ?? [])).catch(() => {});
+      api.get("/api/public/partners").then((r) => setPartners(r.data.partners ?? [])).catch(() => {});
     }
 
     loadPublicContent();
@@ -105,6 +108,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             <a href="#features" onClick={(e) => scrollToSection(e, "features")} className="hover:text-white transition-colors">Features</a>
             <a href="#pricing" onClick={(e) => scrollToSection(e, "pricing")} className="hover:text-white transition-colors">Pricing</a>
             <a href="#about" onClick={(e) => scrollToSection(e, "about")} className="hover:text-white transition-colors">About</a>
+            <a href="#partners" onClick={(e) => scrollToSection(e, "partners")} className="hover:text-white transition-colors">Partners</a>
           </nav>
           <div className="flex items-center gap-1.5 sm:gap-2">
             <button
@@ -357,6 +361,13 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
       </section>
 
       {/* CTA banner */}
+      {partners.length > 0 && <section id="partners" className="border-y border-gray-100 bg-white py-14">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="text-center mb-8"><p className="text-[#0057B8] text-xs font-bold uppercase tracking-[0.18em] mb-2">Our network</p><h2 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Our Partners</h2></div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">{partners.map((partner) => <a key={partner.id} href={partner.websiteUrl || undefined} target={partner.websiteUrl ? "_blank" : undefined} rel="noreferrer" className="min-h-28 bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center justify-center gap-3 hover:border-[#0057B8]/30"><div className="h-12 w-full flex items-center justify-center">{partner.logoUrl ? <img src={partner.logoUrl} alt={`${partner.name} logo`} className="max-h-12 max-w-[85%] object-contain" /> : <Building2 size={28} className="text-[#0057B8]/40" />}</div><span className="text-xs font-semibold text-gray-700 text-center">{partner.name}</span></a>)}</div>
+        </div>
+      </section>}
+
       <section className="max-w-7xl mx-auto px-6 lg:px-10 pb-16">
         <div className="rounded-3xl bg-[#0057B8] p-8 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden">
           <div className="pointer-events-none absolute -top-10 -right-10 w-56 h-56 rounded-full bg-[#FFD700]/20 blur-3xl" />

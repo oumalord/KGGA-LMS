@@ -1,4 +1,4 @@
-import { LayoutDashboard, BookOpen, Award, CalendarDays, FolderOpen, ShieldCheck, Cloud, User, LogOut, X, ClipboardCheck, Users2, Palette, Video } from "lucide-react";
+import { LayoutDashboard, BookOpen, Award, CalendarDays, FolderOpen, ShieldCheck, Cloud, User, LogOut, X, ClipboardCheck, Users2, Palette, Video, Handshake } from "lucide-react";
 import type { Page, Profile, SiteSettings } from "../types";
 
 interface Props {
@@ -26,6 +26,7 @@ export default function Sidebar({ page, setPage, profile, onSignOut, mobileOpen,
     { key: "certificates", label: "Certificates", icon: Award },
     { key: "events", label: "Events", icon: CalendarDays },
     { key: "resources", label: "Resource Center", icon: FolderOpen },
+    { key: "partners", label: "Partners", icon: Handshake },
   ];
   if (["trainer", "coordinator", "admin", "superadmin"].includes(profile.role)) {
     items.push({ key: "students", label: "My Students", icon: Users2 });

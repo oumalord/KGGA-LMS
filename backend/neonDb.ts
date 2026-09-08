@@ -27,6 +27,7 @@ const collectionTables = {
   event_registrations: "event_registrations",
   resources: "resources",
   kgga_videos: "kgga_videos",
+  partners: "partners",
 } as const;
 
 function tableFor(collection: string) {

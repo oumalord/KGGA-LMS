@@ -432,6 +432,80 @@ export const handler = router({
     },
   ],
 
+  "GET /api/public/partners": [
+    async () => {
+      const { items } = await db.list<any>("partners", { limit: 100 });
+      const partners = await Promise.all(items.map(async (partner) => {
+        let logoUrl = partner.logoUrl || null;
+        if (partner.logoPath) {
+          try { logoUrl = (await storage.url([partner.logoPath]))[0].url; } catch { logoUrl = null; }
+        }
+        return { ...partner, logoUrl };
+      }));
+      return json({ partners });
+    },
+  ],
+
+  "GET /api/partners": [
+    requireAuth(),
+    async (ctx) => {
+      const me = await requireProfile(ctx);
+      if (!me) return error("Forbidden", 403);
+      const { items } = await db.list<any>("partners", { limit: 100 });
+      return json({ partners: items });
+    },
+  ],
+
+  "POST /api/partners": [
+    requireAuth(),
+    async (ctx) => {
+      const me = await requireProfile(ctx);
+      if (!me || !isStaff(me.role)) return error("Only administrators can manage partners", 403);
+      const body = ctx.body as { name?: string; websiteUrl?: string; description?: string; contentBase64?: string; contentType?: string };
+      if (!body.name?.trim()) return error("Partner name is required", 400);
+      let logoPath: string | null = null;
+      if (body.contentBase64) {
+        logoPath = `partners/${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        await storage.write([{ path: logoPath, content: body.contentBase64, contentType: body.contentType || "image/png" }]);
+      }
+      const record = { name: body.name.trim(), websiteUrl: body.websiteUrl?.trim() || "", description: body.description?.trim() || "", logoPath, createdAt: Date.now() };
+      const [id] = await db.add("partners", [record]);
+      return json({ partner: { id, ...record } });
+    },
+  ],
+
+  "PUT /api/partners/:id": [
+    requireAuth(),
+    async (ctx) => {
+      const me = await requireProfile(ctx);
+      if (!me || !isStaff(me.role)) return error("Only administrators can manage partners", 403);
+      const [existing] = await db.get<any>("partners", [ctx.params.id]);
+      if (!existing) return error("Partner not found", 404);
+      const body = ctx.body as { name?: string; websiteUrl?: string; description?: string; contentBase64?: string; contentType?: string };
+      let logoPath = existing.logoPath || null;
+      if (body.contentBase64) {
+        logoPath = `partners/${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        await storage.write([{ path: logoPath, content: body.contentBase64, contentType: body.contentType || "image/png" }]);
+      }
+      const record = { ...existing, name: body.name?.trim() || existing.name, websiteUrl: body.websiteUrl?.trim() || "", description: body.description?.trim() || "", logoPath };
+      await db.update("partners", [{ id: existing.id, record }]);
+      return json({ partner: record });
+    },
+  ],
+
+  "DELETE /api/partners/:id": [
+    requireAuth(),
+    async (ctx) => {
+      const me = await requireProfile(ctx);
+      if (!me || !isStaff(me.role)) return error("Only administrators can manage partners", 403);
+      const [existing] = await db.get<any>("partners", [ctx.params.id]);
+      if (!existing) return error("Partner not found", 404);
+      if (existing.logoPath) await storage.delete([existing.logoPath]);
+      await db.delete("partners", [existing.id]);
+      return json({ success: true });
+    },
+  ],
+
   "GET /api/courses": [
     requireAuth(),
     async () => {
