@@ -8,12 +8,12 @@ import { db } from "./neonDb";
 import { ApiError } from "./runtime";
 
 const port = Number(process.env.API_PORT ?? 3001);
-const jwtSecret = process.env.AUTH_JWT_SECRET;
+const jwtSecret = process.env.AUTH_JWT_SECRET ?? process.env.JWT_SECRET;
 const superadminEmail = process.env.SUPERADMIN_EMAIL?.trim().toLowerCase();
 const superadminPassword = process.env.SUPERADMIN_PASSWORD;
 
 if (!jwtSecret || !superadminEmail || !superadminPassword) {
-  throw new Error("AUTH_JWT_SECRET, SUPERADMIN_EMAIL, and SUPERADMIN_PASSWORD must be configured.");
+  throw new Error("AUTH_JWT_SECRET or JWT_SECRET, SUPERADMIN_EMAIL, and SUPERADMIN_PASSWORD must be configured.");
 }
 
 type AuthUser = { userId: string; email: string; name: string };
