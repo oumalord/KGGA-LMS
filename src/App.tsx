@@ -28,6 +28,18 @@ const DEFAULT_SETTINGS: SiteSettingsType = {
   certOrgName: "KENYA GIRL GUIDES ASSOCIATION",
   heroImageUrl: null,
   certificateTemplateResourceId: null,
+  aboutTitle: "Built for the Kenya Girl Guides Association's mission.",
+  aboutText: "Empowering girls and young women through education, leadership development, mentorship, advocacy, digital literacy, entrepreneurship, and community engagement.",
+  aboutStats: [
+    { label: "Counties Reached", value: "20+" },
+    { label: "Learning Areas", value: "6" },
+    { label: "Free Courses", value: "Most" },
+    { label: "Community First", value: "Always" },
+  ],
+  contactEmail: "",
+  contactPhone: "",
+  contactAddress: "",
+  socialLinks: [],
 };
 
 const SETTINGS_CACHE_KEY = "kgga-lms-public-settings";
@@ -69,6 +81,13 @@ function App() {
         certOrgName: payload.certOrgName || DEFAULT_SETTINGS.certOrgName,
         heroImageUrl: payload.heroImageUrl || null,
         certificateTemplateResourceId: payload.certificateTemplateResourceId || null,
+        aboutTitle: payload.aboutTitle || DEFAULT_SETTINGS.aboutTitle,
+        aboutText: payload.aboutText || DEFAULT_SETTINGS.aboutText,
+        aboutStats: Array.isArray(payload.aboutStats) ? payload.aboutStats : DEFAULT_SETTINGS.aboutStats,
+        contactEmail: payload.contactEmail || "",
+        contactPhone: payload.contactPhone || "",
+        contactAddress: payload.contactAddress || "",
+        socialLinks: Array.isArray(payload.socialLinks) ? payload.socialLinks : [],
       };
       window.localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(nextSettings));
       setSettings(nextSettings);

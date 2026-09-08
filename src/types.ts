@@ -188,6 +188,13 @@ export interface SiteSettings {
   certOrgName: string;
   heroImageUrl: string | null;
   certificateTemplateResourceId?: string | null;
+  aboutTitle?: string;
+  aboutText?: string;
+  aboutStats?: { label: string; value: string }[];
+  contactEmail?: string;
+  contactPhone?: string;
+  contactAddress?: string;
+  socialLinks?: { platform: string; url: string }[];
 }
 
 export type Page =

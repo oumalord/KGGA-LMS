@@ -212,25 +212,6 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3] sm:aspect-[16/10] lg:aspect-auto">
               <img src={heroSrc} alt="KGGA learners collaborating on a project" className="w-full h-full lg:h-[460px] object-cover object-top" />
             </div>
-            <div className="absolute -top-3 right-2 sm:-top-6 sm:-right-6 bg-white rounded-2xl shadow-xl p-3 sm:p-4 w-36 sm:w-48">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500">Your Progress</p>
-                <p className="text-[10px] sm:text-[11px] font-bold text-[#0057B8]">78%</p>
-              </div>
-              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-[#FFD700] w-[78%]" />
-              </div>
-              <p className="text-[9px] sm:text-[10px] text-gray-400 mt-2">You're doing great!</p>
-            </div>
-            <div className="absolute -bottom-3 left-2 sm:-bottom-6 sm:-left-6 bg-white rounded-2xl shadow-xl p-3 sm:p-4 w-44 sm:w-56 flex items-center gap-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#FFD700]/20 flex items-center justify-center shrink-0">
-                <PlayCircle size={18} className="text-[#c9a300]" />
-              </div>
-              <div>
-                <p className="text-[9px] sm:text-[10px] text-gray-400">Current Lesson</p>
-                <p className="text-[11px] sm:text-[12px] font-semibold text-gray-800 leading-tight">Future Leaders Workshop</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -349,12 +330,10 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
               About {settings.orgName}
             </span>
             <h2 className="text-2xl lg:text-3xl font-extrabold text-gray-900 mb-4 leading-tight">
-              Built for the Kenya Girl Guides Association's mission.
+              {settings.aboutTitle || "Built for the Kenya Girl Guides Association's mission."}
             </h2>
             <p className="text-gray-500 text-sm leading-relaxed mb-4">
-              {settings.orgName} is the official digital learning ecosystem of the Kenya Girl Guides Association, empowering
-              girls and young women through education, leadership development, mentorship, advocacy, digital
-              literacy, entrepreneurship, and community engagement.
+              {settings.aboutText || `${settings.orgName} is the official digital learning ecosystem of the Kenya Girl Guides Association.`}
             </p>
             <p className="text-gray-500 text-sm leading-relaxed">
               From Nairobi to every county, learners connect with tutors, earn verified certificates, and grow their
@@ -362,12 +341,12 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {[
+            {(settings.aboutStats?.length ? settings.aboutStats : [
               { label: "Counties Reached", value: "20+" },
               { label: "Learning Areas", value: "6" },
               { label: "Free Courses", value: "Most" },
               { label: "Community First", value: "Always" },
-            ].map((s, i) => (
+            ]).map((s, i) => (
               <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 text-center shadow-sm">
                 <p className="text-2xl font-extrabold text-[#0057B8]">{s.value}</p>
                 <p className="text-xs text-gray-500 mt-1">{s.label}</p>
@@ -397,7 +376,13 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
       </section>
 
       <footer className="border-t border-gray-100 px-6 py-8 text-center text-[13px] text-gray-400">
-        &copy; {new Date().getFullYear()} Kenya Girl Guides Association. All rights reserved.
+        <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-3">
+          {settings.contactEmail && <a href={`mailto:${settings.contactEmail}`} className="hover:text-[#0057B8]">{settings.contactEmail}</a>}
+          {settings.contactPhone && <a href={`tel:${settings.contactPhone}`} className="hover:text-[#0057B8]">{settings.contactPhone}</a>}
+          {settings.contactAddress && <span>{settings.contactAddress}</span>}
+        </div>
+        {settings.socialLinks?.length ? <div className="flex flex-wrap justify-center gap-4 mb-3">{settings.socialLinks.filter((link) => link.platform && link.url).map((link) => <a key={link.platform} href={link.url} target="_blank" rel="noreferrer" className="font-semibold text-[#0057B8] hover:underline">{link.platform}</a>)}</div> : null}
+        &copy; {new Date().getFullYear()} {settings.orgName}. All rights reserved.
       </footer>
     </div>
   );

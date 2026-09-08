@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { api } from "../lib/neonClient";
-import { Palette, Upload, Loader2, Save, ImageIcon } from "lucide-react";
+import { Palette, Upload, Loader2, Save, ImageIcon, Plus, Trash2 } from "lucide-react";
 import type { SiteSettings as SiteSettingsType } from "../types";
 
 export default function SiteSettings({ settings, onUpdated }: { settings: SiteSettingsType; onUpdated: () => void }) {
@@ -9,6 +9,13 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
   const [logoText, setLogoText] = useState(settings.logoText);
   const [logoImageUrl, setLogoImageUrl] = useState(settings.logoImageUrl);
   const [certOrgName, setCertOrgName] = useState(settings.certOrgName);
+  const [aboutTitle, setAboutTitle] = useState(settings.aboutTitle || "");
+  const [aboutText, setAboutText] = useState(settings.aboutText || "");
+  const [aboutStats, setAboutStats] = useState(settings.aboutStats || []);
+  const [contactEmail, setContactEmail] = useState(settings.contactEmail || "");
+  const [contactPhone, setContactPhone] = useState(settings.contactPhone || "");
+  const [contactAddress, setContactAddress] = useState(settings.contactAddress || "");
+  const [socialLinks, setSocialLinks] = useState(settings.socialLinks || []);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
@@ -22,7 +29,7 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
     setSaving(true);
     setSaved(false);
     try {
-      await api.put("/api/settings", { orgName, tagline, logoText, logoImageUrl, certOrgName });
+      await api.put("/api/settings", { orgName, tagline, logoText, logoImageUrl, certOrgName, aboutTitle, aboutText, aboutStats, contactEmail, contactPhone, contactAddress, socialLinks });
       onUpdated();
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
@@ -164,6 +171,43 @@ export default function SiteSettings({ settings, onUpdated }: { settings: SiteSe
 
         <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Certificate organization name</label>
         <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-5 text-sm" value={certOrgName} onChange={(e) => setCertOrgName(e.target.value)} />
+
+        <div className="border-t border-gray-100 pt-5 mt-2">
+          <p className="font-bold text-gray-900 mb-4">About section</p>
+          <label className="text-xs font-semibold text-gray-500 mb-1.5 block">About heading</label>
+          <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 text-sm" value={aboutTitle} onChange={(e) => setAboutTitle(e.target.value)} />
+          <label className="text-xs font-semibold text-gray-500 mb-1.5 block">About information</label>
+          <textarea className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 text-sm" rows={4} value={aboutText} onChange={(e) => setAboutText(e.target.value)} />
+          <div className="grid sm:grid-cols-2 gap-3">
+            {aboutStats.map((stat, index) => (
+              <div key={index} className="flex gap-2">
+                <input className="min-w-0 flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="Value" value={stat.value} onChange={(e) => setAboutStats(aboutStats.map((item, i) => i === index ? { ...item, value: e.target.value } : item))} />
+                <input className="min-w-0 flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="Label" value={stat.label} onChange={(e) => setAboutStats(aboutStats.map((item, i) => i === index ? { ...item, label: e.target.value } : item))} />
+                <button type="button" title="Remove statistic" onClick={() => setAboutStats(aboutStats.filter((_, i) => i !== index))} className="text-gray-400 hover:text-red-500"><Trash2 size={16} /></button>
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={() => setAboutStats([...aboutStats, { value: "", label: "" }])} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#0057B8]"><Plus size={14} /> Add statistic</button>
+        </div>
+
+        <div className="border-t border-gray-100 pt-5 mt-5">
+          <p className="font-bold text-gray-900 mb-4">Contact & social media</p>
+          <div className="grid sm:grid-cols-2 gap-3 mb-3">
+            <input className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="Contact email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+            <input className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm" placeholder="Phone number" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
+          </div>
+          <input className="w-full border border-gray-200 rounded-xl px-3 py-2.5 mb-4 text-sm" placeholder="Office address" value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} />
+          <div className="space-y-2">
+            {socialLinks.map((link, index) => (
+              <div key={index} className="flex gap-2">
+                <input className="w-32 border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="Platform" value={link.platform} onChange={(e) => setSocialLinks(socialLinks.map((item, i) => i === index ? { ...item, platform: e.target.value } : item))} />
+                <input className="min-w-0 flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="https://..." value={link.url} onChange={(e) => setSocialLinks(socialLinks.map((item, i) => i === index ? { ...item, url: e.target.value } : item))} />
+                <button type="button" title="Remove social link" onClick={() => setSocialLinks(socialLinks.filter((_, i) => i !== index))} className="text-gray-400 hover:text-red-500"><Trash2 size={16} /></button>
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={() => setSocialLinks([...socialLinks, { platform: "", url: "" }])} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#0057B8]"><Plus size={14} /> Add social link</button>
+        </div>
 
         <div className="flex items-center gap-3">
           <button

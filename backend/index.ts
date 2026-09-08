@@ -343,6 +343,13 @@ export const handler = router({
         certOrgName: settings?.certOrgName || "KENYA GIRL GUIDES ASSOCIATION",
         heroImageUrl,
         certificateTemplateResourceId: settings?.certificateTemplateResourceId || null,
+        aboutTitle: settings?.aboutTitle || "Built for the Kenya Girl Guides Association's mission.",
+        aboutText: settings?.aboutText || "Empowering girls and young women through education, leadership development, mentorship, advocacy, digital literacy, entrepreneurship, and community engagement.",
+        aboutStats: settings?.aboutStats || [],
+        contactEmail: settings?.contactEmail || "",
+        contactPhone: settings?.contactPhone || "",
+        contactAddress: settings?.contactAddress || "",
+        socialLinks: settings?.socialLinks || [],
       });
     },
   ],
