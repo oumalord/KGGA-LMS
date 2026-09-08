@@ -61,11 +61,12 @@ function App() {
       const r = await api.get<SiteSettingsType>("/api/settings/public");
       const payload = r.data as any;
       const nextSettings = {
-        orgName: payload.orgName,
-        tagline: payload.tagline,
-        logoText: payload.logoText,
+        ...DEFAULT_SETTINGS,
+        orgName: payload.orgName || DEFAULT_SETTINGS.orgName,
+        tagline: payload.tagline || DEFAULT_SETTINGS.tagline,
+        logoText: payload.logoText || DEFAULT_SETTINGS.logoText,
         logoImageUrl: payload.logoImageUrl || null,
-        certOrgName: payload.certOrgName,
+        certOrgName: payload.certOrgName || DEFAULT_SETTINGS.certOrgName,
         heroImageUrl: payload.heroImageUrl || null,
         certificateTemplateResourceId: payload.certificateTemplateResourceId || null,
       };

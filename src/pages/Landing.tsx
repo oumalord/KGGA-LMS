@@ -85,9 +85,9 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
     <div className="min-h-screen bg-white">
       {/* Nav */}
       <header className="sticky top-0 z-30 bg-[#071633]/95 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-10 py-3 sm:py-4">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-10 h-10 rounded-full bg-[#FFD700] ring-2 ring-white/80 ring-offset-2 ring-offset-[#071633] shadow-[0_5px_18px_rgba(255,215,0,0.38)] overflow-hidden flex items-center justify-center font-black text-[#071633] text-xs shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#FFD700] ring-2 ring-white/80 ring-offset-2 ring-offset-[#071633] shadow-[0_5px_18px_rgba(255,215,0,0.38)] overflow-hidden flex items-center justify-center font-black text-[#071633] text-[10px] sm:text-xs shrink-0">
               {settings.logoImageUrl ? (
                 <img src={settings.logoImageUrl} alt="KGGA logo" className="w-full h-full object-cover drop-shadow-md" />
               ) : (
@@ -95,18 +95,18 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
               )}
             </div>
             <div className="min-w-0">
-              <p className="font-bold text-white tracking-tight text-[15px] leading-tight truncate">{settings.orgName}</p>
-              <p className="text-[10px] text-white/50 leading-tight">Learn Anytime, Anywhere.</p>
+              <p className="font-bold text-white tracking-tight text-[13px] sm:text-[15px] leading-tight truncate">{settings.orgName}</p>
+              <p className="text-[9px] sm:text-[10px] text-white/50 leading-tight">Learn Anytime, Anywhere.</p>
             </div>
           </div>
-          <nav className="hidden md:flex items-center gap-8 text-[13px] font-medium text-white/70">
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-[13px] font-medium text-white/70">
             <a href="#home" onClick={(e) => scrollToSection(e, "home")} className="text-white hover:text-[#FFD700] transition-colors">Home</a>
             <a href="#courses" onClick={(e) => scrollToSection(e, "courses")} className="hover:text-white transition-colors">Courses</a>
             <a href="#features" onClick={(e) => scrollToSection(e, "features")} className="hover:text-white transition-colors">Features</a>
             <a href="#pricing" onClick={(e) => scrollToSection(e, "pricing")} className="hover:text-white transition-colors">Pricing</a>
             <a href="#about" onClick={(e) => scrollToSection(e, "about")} className="hover:text-white transition-colors">About</a>
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={() => {
                 setIsStudentMode(false);
@@ -115,14 +115,14 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
                 setShowLoginCard((value) => !value);
               }}
               disabled={signingIn}
-              className="text-white/85 hover:text-white px-3 py-2 text-sm font-medium disabled:opacity-60"
+              className="text-white/85 hover:text-white px-2.5 py-2 text-[12px] sm:text-sm font-medium disabled:opacity-60"
             >
               Log In
             </button>
             <button
               onClick={onRegister}
               disabled={signingIn}
-              className="bg-[#FFD700] text-[#071633] px-4 py-2 rounded-lg font-bold text-sm hover:brightness-95 transition-all disabled:opacity-60"
+              className="bg-[#FFD700] text-[#071633] px-3 sm:px-4 py-2 rounded-lg font-bold text-[11px] sm:text-sm hover:brightness-95 transition-all disabled:opacity-60"
             >
               {signingIn ? "Signing in…" : "Student Access"}
             </button>
@@ -169,28 +169,28 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
         <div className="pointer-events-none absolute top-10 right-0 w-[480px] h-[480px] rounded-full bg-[#0057B8]/30 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 left-10 w-[300px] h-[300px] rounded-full bg-[#FFD700]/10 blur-3xl" />
 
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-12 sm:py-16 lg:py-24 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-12 lg:py-24 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-14 items-center">
           <div>
-            <span className="inline-flex items-center gap-1.5 bg-white/10 text-[#FFD700] px-3.5 py-1.5 rounded-full text-[12px] font-semibold mb-6">
+            <span className="inline-flex items-center gap-1.5 bg-white/10 text-[#FFD700] px-3 py-1.5 rounded-full text-[11px] sm:text-[12px] font-semibold mb-4 sm:mb-6">
               <Sparkles size={12} /> Official Digital Learning Ecosystem
             </span>
-            <h1 className="text-4xl lg:text-[52px] font-extrabold text-white leading-[1.08] mb-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-[52px] font-extrabold text-white leading-[1.04] sm:leading-[1.08] mb-4 sm:mb-6">
               Learn Skills.
               <br />
               Advance Your <span className="text-[#FFD700]">Future.</span>
             </h1>
-            <p className="text-white/65 text-base lg:text-lg mb-8 max-w-md leading-relaxed">{settings.tagline}</p>
-            <div className="flex flex-wrap gap-3 mb-8">
+            <p className="text-white/65 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 max-w-md leading-relaxed">{settings.tagline}</p>
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6 sm:mb-8">
               <button
                 onClick={onSignIn}
-                className="inline-flex items-center gap-2 bg-[#FFD700] text-[#071633] px-6 py-3.5 rounded-xl font-bold text-sm hover:brightness-95 shadow-lg shadow-black/20 transition-all"
+                className="inline-flex items-center justify-center gap-2 bg-[#FFD700] text-[#071633] px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl font-bold text-sm hover:brightness-95 shadow-lg shadow-black/20 transition-all w-full sm:w-auto"
               >
                 Explore Courses <ArrowRight size={16} />
               </button>
               <a
                 href="#features"
                 onClick={(e) => scrollToSection(e, "features")}
-                className="inline-flex items-center gap-2 bg-white/10 text-white px-6 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/15 transition-all"
+                className="inline-flex items-center justify-center gap-2 bg-white/10 text-white px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl font-semibold text-sm hover:bg-white/15 transition-all w-full sm:w-auto"
               >
                 <PlayCircle size={16} /> How It Works
               </a>
@@ -203,7 +203,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
                   </div>
                 ))}
               </div>
-              <p className="text-white/60 text-xs">Learners already learning and growing with {settings.orgName}.</p>
+              <p className="text-white/60 text-[11px] sm:text-xs">Learners already learning and growing with {settings.orgName}.</p>
             </div>
           </div>
 
@@ -212,23 +212,23 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/3] sm:aspect-[16/10] lg:aspect-auto">
               <img src={heroSrc} alt="KGGA learners collaborating on a project" className="w-full h-full lg:h-[460px] object-cover object-top" />
             </div>
-            <div className="absolute -top-4 right-2 sm:-top-6 sm:-right-6 bg-white rounded-2xl shadow-xl p-3 sm:p-4 w-40 sm:w-48">
+            <div className="absolute -top-3 right-2 sm:-top-6 sm:-right-6 bg-white rounded-2xl shadow-xl p-3 sm:p-4 w-36 sm:w-48">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-[11px] font-semibold text-gray-500">Your Progress</p>
-                <p className="text-[11px] font-bold text-[#0057B8]">78%</p>
+                <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500">Your Progress</p>
+                <p className="text-[10px] sm:text-[11px] font-bold text-[#0057B8]">78%</p>
               </div>
               <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                 <div className="h-full bg-[#FFD700] w-[78%]" />
               </div>
-              <p className="text-[10px] text-gray-400 mt-2">You're doing great!</p>
+              <p className="text-[9px] sm:text-[10px] text-gray-400 mt-2">You're doing great!</p>
             </div>
-            <div className="absolute -bottom-4 left-2 sm:-bottom-6 sm:-left-6 bg-white rounded-2xl shadow-xl p-3 sm:p-4 w-52 sm:w-56 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#FFD700]/20 flex items-center justify-center shrink-0">
+            <div className="absolute -bottom-3 left-2 sm:-bottom-6 sm:-left-6 bg-white rounded-2xl shadow-xl p-3 sm:p-4 w-44 sm:w-56 flex items-center gap-3">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#FFD700]/20 flex items-center justify-center shrink-0">
                 <PlayCircle size={18} className="text-[#c9a300]" />
               </div>
               <div>
-                <p className="text-[10px] text-gray-400">Current Lesson</p>
-                <p className="text-[12px] font-semibold text-gray-800 leading-tight">Future Leaders Workshop</p>
+                <p className="text-[9px] sm:text-[10px] text-gray-400">Current Lesson</p>
+                <p className="text-[11px] sm:text-[12px] font-semibold text-gray-800 leading-tight">Future Leaders Workshop</p>
               </div>
             </div>
           </div>

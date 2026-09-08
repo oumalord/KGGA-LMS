@@ -1,10 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --coursera-font: "Source Sans 3", "Segoe UI", sans-serif;
+}
+
 html, body, #root { height: 100%; }
-body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Inter, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; letter-spacing: -0.011em; background-color: #fbfbfd; }
+body {
+  font-family: var(--coursera-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.011em;
+  background-color: #fbfbfd;
+  color: #101828;
+}
+
+* { box-sizing: border-box; }
+img { max-width: 100%; display: block; }
+button, input, select, textarea { font: inherit; }
 ::selection { background: #0057B822; }
 .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 @media print { body * { visibility: hidden; } }
+@media (max-width: 640px) {
+  html { font-size: 15px; }
+}
