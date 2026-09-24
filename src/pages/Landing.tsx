@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/neonClient";
 import {
   BookOpen, Award, Users, ArrowRight, Sparkles, Building2,
-  Star, Clock, PlayCircle, CheckCircle2, Check,
+  Star, Clock, PlayCircle, CheckCircle2, Check, Menu, X,
 } from "lucide-react";
 import type { SiteSettings } from "../types";
 import type { KGGAVideo } from "../types";
@@ -37,6 +37,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
   const [videos, setVideos] = useState<KGGAVideo[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [showLoginCard, setShowLoginCard] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isStudentMode, setIsStudentMode] = useState(false);
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -69,6 +70,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
 
   function scrollToSection(e: React.MouseEvent, id: string) {
     e.preventDefault();
+    setMobileNavOpen(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -136,8 +138,21 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             >
               {signingIn ? "Signing in…" : "Student Access"}
             </button>
+            <button onClick={() => setMobileNavOpen((v) => !v)} className="md:hidden text-white p-2 -mr-2" aria-label="Toggle navigation menu">
+              {mobileNavOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
+        {mobileNavOpen && (
+          <nav className="md:hidden border-t border-white/10 bg-[#071633] px-4 sm:px-6 py-3 flex flex-col gap-1 text-[13px] font-medium text-white/70">
+            <a href="#home" onClick={(e) => scrollToSection(e, "home")} className="py-2 text-white">Home</a>
+            <a href="#courses" onClick={(e) => scrollToSection(e, "courses")} className="py-2 hover:text-white">Courses</a>
+            <a href="#features" onClick={(e) => scrollToSection(e, "features")} className="py-2 hover:text-white">Features</a>
+            <a href="#pricing" onClick={(e) => scrollToSection(e, "pricing")} className="py-2 hover:text-white">Pricing</a>
+            <a href="#about" onClick={(e) => scrollToSection(e, "about")} className="py-2 hover:text-white">About</a>
+            <a href="#partners" onClick={(e) => scrollToSection(e, "partners")} className="py-2 hover:text-white">Partners</a>
+          </nav>
+        )}
       </header>
 
       {showLoginCard && (

@@ -135,14 +135,17 @@ function App() {
   }
 
   useEffect(() => {
-    void loadSettings();
+    const hasCachedSettings = Boolean(window.localStorage.getItem(SETTINGS_CACHE_KEY));
+    const settingsPromise = loadSettings();
     (async () => {
-      if (auth.isSignedIn()) {
-        await Promise.race([
-          loadProfile(),
-          new Promise<void>((resolve) => window.setTimeout(resolve, 1_500)),
-        ]);
-      }
+      const tasks = [
+        hasCachedSettings ? Promise.resolve() : settingsPromise,
+        auth.isSignedIn() ? loadProfile() : Promise.resolve(),
+      ];
+      await Promise.race([
+        Promise.all(tasks),
+        new Promise<void>((resolve) => window.setTimeout(resolve, 1_500)),
+      ]);
       setChecking(false);
     })();
 
