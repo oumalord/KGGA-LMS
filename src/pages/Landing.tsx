@@ -82,6 +82,14 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
     onSignIn(identifier, password);
   }
 
+  function openLogin() {
+    setIsStudentMode(false);
+    setIdentifier("");
+    setPassword("");
+    setLoginError("");
+    setShowLoginCard(true);
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Nav */}
@@ -184,7 +192,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             <p className="text-white/65 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 max-w-md leading-relaxed">{settings.tagline}</p>
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6 sm:mb-8">
               <button
-                onClick={onSignIn}
+                onClick={openLogin}
                 className="inline-flex items-center justify-center gap-2 bg-[#FFD700] text-[#071633] px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl font-bold text-sm hover:brightness-95 shadow-lg shadow-black/20 transition-all w-full sm:w-auto"
               >
                 Explore Courses <ArrowRight size={16} />
@@ -273,7 +281,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
           </div>
         )}
         <div className="text-center mt-10">
-          <button onClick={onSignIn} className="inline-flex items-center gap-2 bg-[#071633] text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-[#0a1f45]">
+          <button onClick={openLogin} className="inline-flex items-center gap-2 bg-[#071633] text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-[#0a1f45]">
             View All Courses <ArrowRight size={15} />
           </button>
         </div>
@@ -374,7 +382,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             <p className="text-white/70 text-sm">Join thousands of learners and take the first step in your career growth.</p>
           </div>
           <div className="relative flex items-center gap-3">
-            <button onClick={onSignIn} className="bg-[#FFD700] text-[#0057B8] px-6 py-3 rounded-xl font-bold text-sm hover:brightness-95 flex items-center gap-2">
+            <button onClick={openLogin} className="bg-[#FFD700] text-[#0057B8] px-6 py-3 rounded-xl font-bold text-sm hover:brightness-95 flex items-center gap-2">
               Get Started for Free <ArrowRight size={15} />
             </button>
             <p className="text-white/60 text-[11px] hidden sm:flex items-center gap-1">

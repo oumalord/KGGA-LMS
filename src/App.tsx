@@ -125,7 +125,7 @@ function App() {
       setProfile(registeredProfile);
       setNeedsRoleSelection(false);
       setRegistrationRequested(false);
-      setPage(registeredProfile.role === "learner" ? "courses" : "dashboard");
+      setPage("dashboard");
       setAutoOpenStudentLogin(false);
       setStudentLoginHint(null);
       return null;
@@ -167,7 +167,7 @@ function App() {
       if (payload.profile) {
         setProfile(payload.profile);
         setNeedsRoleSelection(false);
-        setPage(payload.profile.role === "learner" ? "courses" : "dashboard");
+        setPage("dashboard");
         setStudentLoginHint(null);
         setAutoOpenStudentLogin(false);
       } else {
@@ -177,7 +177,7 @@ function App() {
       if (signInResult?.profile) {
         setProfile(signInResult.profile);
         setNeedsRoleSelection(false);
-        setPage(signInResult.profile.role === "learner" ? "courses" : "dashboard");
+        setPage("dashboard");
         setStudentLoginHint(null);
         setAutoOpenStudentLogin(false);
       }
