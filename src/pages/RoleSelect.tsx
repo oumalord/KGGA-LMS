@@ -24,7 +24,7 @@ const COUNTIES = [
   "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Kiambu", "Machakos", "Kajiado", "Uasin Gishu",
   "Meru", "Kilifi", "Kakamega", "Bungoma", "Nyeri", "Kisii", "Trans Nzoia", "Other",
 ];
-const GUIDING_UNITS = ["Brownie Pack", "Guide Company", "Ranger Unit", "Young Leader Unit", "Adult Leader Unit", "Volunteer Unit", "Other"];
+const GUIDING_UNITS = ["Brownie Pack", "Guide Company", "Ranger Unit", "Young Leader Unit", "Adult Leader Unit", "Volunteer Unit", "Bravo", "Other"];
 const MEMBERSHIP_CATEGORIES = ["Brownie", "Guide", "Ranger", "Young Leader", "Adult Leader", "Volunteer"];
 
 export default function RoleSelect({ onSelect, initialError, settings }: Props) {
