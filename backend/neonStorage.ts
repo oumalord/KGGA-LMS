@@ -8,6 +8,9 @@ if (!databaseUrl) {
 
 const sql = neon(databaseUrl);
 let schemaReady: Promise<void> | undefined;
+const URL_CACHE_TTL_MS = 10 * 60 * 1000;
+const URL_CACHE_MAX_ENTRIES = 100;
+const urlCache = new Map<string, { url: string; expiresAt: number }>();
 
 function ensureSchema() {
   schemaReady ??= (async () => {
@@ -29,6 +32,7 @@ export const storage = {
       await sql`INSERT INTO files (path, content_base64, content_type)
         VALUES (${file.path}, ${file.content}, ${file.contentType})
         ON CONFLICT (path) DO UPDATE SET content_base64 = EXCLUDED.content_base64, content_type = EXCLUDED.content_type, created_at = NOW()`;
+      urlCache.delete(file.path);
       results.push(true);
     }
     return results;
@@ -38,9 +42,20 @@ export const storage = {
     await ensureSchema();
     const urls: { url: string }[] = [];
     for (const path of paths) {
+      const cached = urlCache.get(path);
+      if (cached && cached.expiresAt > Date.now()) {
+        urls.push({ url: cached.url });
+        continue;
+      }
       const [file] = await sql`SELECT content_base64, content_type FROM files WHERE path = ${path}`;
       if (!file) throw new Error(`Stored file not found: ${path}`);
-      urls.push({ url: `data:${file.content_type};base64,${file.content_base64}` });
+      const url = `data:${file.content_type};base64,${file.content_base64}`;
+      if (urlCache.size >= URL_CACHE_MAX_ENTRIES) {
+        const oldestPath = urlCache.keys().next().value;
+        if (oldestPath) urlCache.delete(oldestPath);
+      }
+      urlCache.set(path, { url, expiresAt: Date.now() + URL_CACHE_TTL_MS });
+      urls.push({ url });
     }
     return urls;
   },
@@ -48,5 +63,6 @@ export const storage = {
   async delete(paths: string[]) {
     await ensureSchema();
     await sql`DELETE FROM files WHERE path = ANY(${paths}::text[])`;
+    for (const path of paths) urlCache.delete(path);
   },
 };

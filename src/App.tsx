@@ -147,10 +147,8 @@ function App() {
     })();
 
     const refreshSettings = () => loadSettings();
-    const intervalId = window.setInterval(refreshSettings, 30_000);
     window.addEventListener("focus", refreshSettings);
     return () => {
-      window.clearInterval(intervalId);
       window.removeEventListener("focus", refreshSettings);
     };
   }, []);

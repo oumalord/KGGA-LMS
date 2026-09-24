@@ -51,10 +51,8 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
     }
 
     loadPublicContent();
-    const intervalId = window.setInterval(loadPublicContent, 30_000);
     window.addEventListener("focus", loadPublicContent);
     return () => {
-      window.clearInterval(intervalId);
       window.removeEventListener("focus", loadPublicContent);
     };
   }, []);
