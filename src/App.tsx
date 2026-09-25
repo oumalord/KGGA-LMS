@@ -101,7 +101,7 @@ function App() {
       const r = await api.get("/api/me");
       const payload = r.data as any;
       setProfile(payload.profile);
-      setShowLearnerWebsite(payload.profile?.role === "learner");
+      setShowLearnerWebsite(false);
       setNeedsRoleSelection(!!payload.needsRoleSelection);
     } catch {
       setProfile(null);
@@ -126,7 +126,7 @@ function App() {
       const signInResult = await auth.signIn(details.email, details.password);
       if (!signInResult.profile) return "Your account was created, but automatic sign-in failed. Please sign in with your email and password.";
       setProfile(registeredProfile);
-      setShowLearnerWebsite(true);
+      setShowLearnerWebsite(false);
       setNeedsRoleSelection(false);
       setRegistrationRequested(false);
       setPage("dashboard");
@@ -173,7 +173,7 @@ function App() {
 
       if (payload.profile) {
         setProfile(payload.profile);
-        setShowLearnerWebsite(payload.profile.role === "learner");
+        setShowLearnerWebsite(false);
         setNeedsRoleSelection(false);
         setPage("dashboard");
         setStudentLoginHint(null);
@@ -184,7 +184,7 @@ function App() {
 
       if (signInResult?.profile) {
         setProfile(signInResult.profile);
-        setShowLearnerWebsite(signInResult.profile.role === "learner");
+        setShowLearnerWebsite(false);
         setNeedsRoleSelection(false);
         setPage("dashboard");
         setStudentLoginHint(null);
