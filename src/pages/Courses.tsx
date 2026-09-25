@@ -231,14 +231,18 @@ export default function Courses({ profile, onOpenCourse }: Props) {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-lg max-h-[88vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
+        <div className="fixed inset-0 lg:left-64 bg-[#fbfbfd] z-50 flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between px-5 sm:px-8 py-4 bg-white border-b border-gray-100 shrink-0">
+            <div>
               <p className="font-bold text-lg text-gray-900">Create Course</p>
-              <button onClick={() => setShowForm(false)}>
-                <X size={20} className="text-gray-400" />
-              </button>
+              <p className="text-sm text-gray-500">Set up course details and build its curriculum.</p>
             </div>
+            <button onClick={() => setShowForm(false)} aria-label="Close course editor" className="p-2 rounded-lg hover:bg-gray-100">
+              <X size={20} className="text-gray-500" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-6">
+          <div className="bg-white rounded-2xl p-5 sm:p-7 w-full max-w-5xl mx-auto border border-gray-100 shadow-sm">
             <input
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0057B8]/30"
               placeholder="Course title"
@@ -381,6 +385,7 @@ export default function Courses({ profile, onOpenCourse }: Props) {
             >
               Create Course
             </button>
+          </div>
           </div>
         </div>
       )}

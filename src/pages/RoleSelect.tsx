@@ -25,7 +25,7 @@ const COUNTIES = [
   "Meru", "Kilifi", "Kakamega", "Bungoma", "Nyeri", "Kisii", "Trans Nzoia", "Other",
 ];
 const GUIDING_UNITS = ["Brownie Pack", "Guide Company", "Ranger Unit", "Young Leader Unit", "Adult Leader Unit", "Volunteer Unit", "Bravo", "Other"];
-const MEMBERSHIP_CATEGORIES = ["Brownie", "Guide", "Ranger", "Young Leader", "Adult Leader", "Volunteer"];
+const MEMBERSHIP_CATEGORIES = ["Brownie", "Guide", "Ranger", "Young Leader", "Adult Leader", "Volunteer", "Bravo"];
 
 export default function RoleSelect({ onSelect, initialError, settings }: Props) {
   const [name, setName] = useState("");
