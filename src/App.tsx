@@ -156,26 +156,11 @@ function App() {
 
       const signInResult = await auth.signIn(normalizedIdentifier, password);
       if (!signInResult.profile) return;
-      const r = await api.get("/api/me");
-      const payload = r.data as any;
-
-      if (payload.profile) {
-        setProfile(payload.profile);
-        setNeedsRoleSelection(false);
-        setPage("dashboard");
-        setStudentLoginHint(null);
-        setAutoOpenStudentLogin(false);
-      } else {
-        setNeedsRoleSelection(true);
-      }
-
-      if (signInResult?.profile) {
-        setProfile(signInResult.profile);
-        setNeedsRoleSelection(false);
-        setPage("dashboard");
-        setStudentLoginHint(null);
-        setAutoOpenStudentLogin(false);
-      }
+      setProfile(signInResult.profile);
+      setNeedsRoleSelection(false);
+      setPage("dashboard");
+      setStudentLoginHint(null);
+      setAutoOpenStudentLogin(false);
     } catch (error: any) {
       setSignInError(error?.response?.data?.error || "Unable to sign in right now. Please try again.");
     } finally {
