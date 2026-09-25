@@ -58,7 +58,6 @@ function App() {
   const [checking, setChecking] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [showLearnerWebsite, setShowLearnerWebsite] = useState(false);
   const [needsRoleSelection, setNeedsRoleSelection] = useState(false);
   const [registrationRequested, setRegistrationRequested] = useState(false);
   const [roleError, setRoleError] = useState<string | null>(null);
@@ -101,11 +100,9 @@ function App() {
       const r = await api.get("/api/me");
       const payload = r.data as any;
       setProfile(payload.profile);
-      setShowLearnerWebsite(false);
       setNeedsRoleSelection(!!payload.needsRoleSelection);
     } catch {
       setProfile(null);
-      setShowLearnerWebsite(false);
     }
   }
 
@@ -126,7 +123,6 @@ function App() {
       const signInResult = await auth.signIn(details.email, details.password);
       if (!signInResult.profile) return "Your account was created, but automatic sign-in failed. Please sign in with your email and password.";
       setProfile(registeredProfile);
-      setShowLearnerWebsite(false);
       setNeedsRoleSelection(false);
       setRegistrationRequested(false);
       setPage("dashboard");
@@ -139,17 +135,9 @@ function App() {
   }
 
   useEffect(() => {
-    const hasCachedSettings = Boolean(window.localStorage.getItem(SETTINGS_CACHE_KEY));
-    const settingsPromise = loadSettings();
+    void loadSettings();
     (async () => {
-      const tasks = [
-        hasCachedSettings ? Promise.resolve() : settingsPromise,
-        auth.isSignedIn() ? loadProfile() : Promise.resolve(),
-      ];
-      await Promise.race([
-        Promise.all(tasks),
-        new Promise<void>((resolve) => window.setTimeout(resolve, 1_000)),
-      ]);
+      if (auth.isSignedIn()) await loadProfile();
       setChecking(false);
     })();
 
@@ -173,7 +161,6 @@ function App() {
 
       if (payload.profile) {
         setProfile(payload.profile);
-        setShowLearnerWebsite(false);
         setNeedsRoleSelection(false);
         setPage("dashboard");
         setStudentLoginHint(null);
@@ -184,7 +171,6 @@ function App() {
 
       if (signInResult?.profile) {
         setProfile(signInResult.profile);
-        setShowLearnerWebsite(false);
         setNeedsRoleSelection(false);
         setPage("dashboard");
         setStudentLoginHint(null);
@@ -200,7 +186,6 @@ function App() {
   async function handleSignOut() {
     await auth.signOut();
     setProfile(null);
-    setShowLearnerWebsite(false);
     setPage("dashboard");
   }
 
@@ -209,14 +194,12 @@ function App() {
   }
 
   function openCourse(id: string) {
-    setShowLearnerWebsite(false);
     setActiveCourseId(id);
     setPage("course-detail");
   }
 
   function navigate(page: Page) {
     setPage(page);
-    if (profile?.role === "learner") setShowLearnerWebsite(page === "dashboard");
   }
 
   if (checking) {
@@ -263,20 +246,6 @@ function App() {
 
   if (profile.mustChangePassword) {
     return <ProfilePage profile={profile} requirePasswordChange onPasswordChanged={handlePasswordChanged} />;
-  }
-
-  if (profile.role === "learner" && showLearnerWebsite) {
-    return (
-      <Landing
-        onSignIn={handleSignIn}
-        signingIn={signingIn}
-        settings={settings}
-        heroFallback={heroImageDataUrl}
-        onRegister={() => {}}
-        authenticated
-        onBrowseCourses={() => { setShowLearnerWebsite(false); setPage("courses"); }}
-      />
-    );
   }
 
   const isSuper = profile.role === "superadmin";

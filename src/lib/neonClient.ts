@@ -8,12 +8,20 @@ type ApiClient = {
 };
 
 const SESSION_KEY = "kgga-lms-session";
+const REQUEST_TIMEOUT_MS = 8_000;
 
 async function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", url: string, body?: unknown): Promise<ApiResponse<T>> {
   const token = window.localStorage.getItem(SESSION_KEY);
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;
-  const response = await fetch(url, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let response: Response;
+  try {
+    response = await fetch(url, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: controller.signal });
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error: any = new Error(data.error || "Request failed.");
@@ -26,11 +34,19 @@ async function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", url: string
 export const auth = {
   isSignedIn: () => Boolean(window.localStorage.getItem(SESSION_KEY)),
   async signIn(identifier?: string, password?: string) {
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identifier, password }),
-    });
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    let response: Response;
+    try {
+      response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifier, password }),
+        signal: controller.signal,
+      });
+    } finally {
+      window.clearTimeout(timeoutId);
+    }
     const result = await response.json().catch(() => ({}));
     if (!response.ok) {
       window.localStorage.removeItem(SESSION_KEY);
