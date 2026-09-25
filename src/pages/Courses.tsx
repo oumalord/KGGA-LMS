@@ -25,6 +25,8 @@ const CONTENT_SOURCES = [
 
 interface DraftLesson {
   id: string;
+  moduleId: string;
+  moduleTitle: string;
   title: string;
   type: string;
   contentSource: "text" | "youtube" | "drive" | "upload";
@@ -37,7 +39,7 @@ interface DraftLesson {
 }
 
 function newLesson(title = "", type = "video"): DraftLesson {
-  return { id: `l${Date.now()}${Math.random().toString(36).slice(2, 6)}`, title, type, contentSource: "text", contentText: "", youtubeUrl: "", driveUrl: "" };
+  return { id: `l${Date.now()}${Math.random().toString(36).slice(2, 6)}`, moduleId: "m1", moduleTitle: "Course Curriculum", title, type, contentSource: "text", contentText: "", youtubeUrl: "", driveUrl: "" };
 }
 
 function CourseCover({ course }: { course: Course }) {
@@ -60,6 +62,7 @@ export default function Courses({ profile, onOpenCourse }: Props) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Leadership");
@@ -80,6 +83,44 @@ export default function Courses({ profile, onOpenCourse }: Props) {
   }
   function removeLesson(id: string) {
     setLessons(lessons.filter((l) => l.id !== id));
+  }
+
+  function editCourse(course: Course) {
+    setEditingCourse(course);
+    setTitle(course.title);
+    setDescription(course.description);
+    setCategory(course.category);
+    setIsPaid(course.isPaid);
+    setPrice(String(course.price || 500));
+    setCoverResourceId(course.coverResourceId ?? null);
+    setCoverName(course.coverResourceId ? "Current course cover" : "");
+    setLessons(course.modules.flatMap((module) => module.lessons.map((lesson) => ({
+      id: lesson.id,
+      moduleId: module.id,
+      moduleTitle: module.title,
+      title: lesson.title,
+      type: lesson.type,
+      contentSource: lesson.contentSource ?? (lesson.youtubeUrl ? "youtube" : lesson.driveUrl ? "drive" : lesson.resourceId ? "upload" : "text"),
+      contentText: lesson.contentText ?? "",
+      youtubeUrl: lesson.youtubeUrl ?? "",
+      driveUrl: lesson.driveUrl ?? "",
+      resourceId: lesson.resourceId,
+      fileName: lesson.fileName,
+    }))));
+    setShowForm(true);
+  }
+
+  function startNewCourse() {
+    setEditingCourse(null);
+    setTitle("");
+    setDescription("");
+    setCategory("Leadership");
+    setIsPaid(false);
+    setPrice("500");
+    setCoverResourceId(null);
+    setCoverName("");
+    setLessons([newLesson("Welcome & Orientation", "video"), newLesson("Course Handbook", "document")]);
+    setShowForm(true);
   }
 
   async function handleUpload(lessonId: string, file: File) {
@@ -121,22 +162,27 @@ export default function Courses({ profile, onOpenCourse }: Props) {
 
   useEffect(load, []);
 
-  async function createCourse() {
+  async function saveCourse() {
     if (!title.trim()) return;
     const validLessons = lessons.filter((l) => l.title.trim());
-    await api.post("/api/courses", {
+    const modulesById = new Map<string, { id: string; title: string; lessons: DraftLesson[] }>();
+    for (const lesson of validLessons) {
+      const module = modulesById.get(lesson.moduleId) ?? { id: lesson.moduleId, title: lesson.moduleTitle, lessons: [] };
+      module.lessons.push(lesson);
+      modulesById.set(lesson.moduleId, module);
+    }
+    const courseData = {
       title,
       description,
       category,
       isPaid,
       price: isPaid ? Number(price) || 0 : 0,
-      coverColor: COLORS[Math.floor(Math.random() * COLORS.length)],
+      coverColor: editingCourse?.coverColor ?? COLORS[Math.floor(Math.random() * COLORS.length)],
       coverResourceId,
-      modules: [
-        {
-          id: "m1",
-          title: "Course Curriculum",
-          lessons: (validLessons.length > 0 ? validLessons : [newLesson("Welcome & Orientation", "video")]).map((l) => ({
+      modules: Array.from(modulesById.values()).map((module) => ({
+        id: module.id,
+        title: module.title,
+        lessons: module.lessons.map((l) => ({
             id: l.id,
             title: l.title,
             type: l.type,
@@ -147,9 +193,10 @@ export default function Courses({ profile, onOpenCourse }: Props) {
             resourceId: l.contentSource === "upload" ? l.resourceId : undefined,
             fileName: l.contentSource === "upload" ? l.fileName : undefined,
           })),
-        },
-      ],
-    });
+      })),
+    };
+    if (editingCourse) await api.put(`/api/courses/${editingCourse.id}`, courseData);
+    else await api.post("/api/courses", courseData);
     setTitle("");
     setDescription("");
     setIsPaid(false);
@@ -157,6 +204,7 @@ export default function Courses({ profile, onOpenCourse }: Props) {
     setCoverResourceId(null);
     setCoverName("");
     setLessons([newLesson("Welcome & Orientation", "video"), newLesson("Course Handbook", "document")]);
+    setEditingCourse(null);
     setShowForm(false);
     load();
   }
@@ -175,7 +223,7 @@ export default function Courses({ profile, onOpenCourse }: Props) {
         </div>
         {canCreate && (
           <button
-            onClick={() => setShowForm(true)}
+            onClick={startNewCourse}
             className="flex items-center gap-2 bg-[#0057B8] text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:brightness-110 shadow-md"
           >
             <Plus size={16} /> New Course
@@ -212,7 +260,17 @@ export default function Courses({ profile, onOpenCourse }: Props) {
                 <p className="text-xs text-gray-500 line-clamp-2 mb-3">{c.description || "No description provided."}</p>
                 <div className="flex items-center justify-between">
                   <p className="text-[11px] text-gray-400">By {c.trainerName}</p>
-                  {(profile.authUserId === c.trainerId || profile.role === "admin" || profile.role === "superadmin") && (
+                  {(profile.authUserId === c.trainerId || profile.role === "superadmin") && (
+                    <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        editCourse(c);
+                      }}
+                      className="text-xs font-semibold text-[#0057B8] hover:underline"
+                    >
+                      Edit
+                    </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -222,6 +280,7 @@ export default function Courses({ profile, onOpenCourse }: Props) {
                     >
                       <Trash2 size={15} />
                     </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -234,10 +293,10 @@ export default function Courses({ profile, onOpenCourse }: Props) {
         <div className="fixed inset-0 lg:left-64 bg-[#fbfbfd] z-50 flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-5 sm:px-8 py-4 bg-white border-b border-gray-100 shrink-0">
             <div>
-              <p className="font-bold text-lg text-gray-900">Create Course</p>
-              <p className="text-sm text-gray-500">Set up course details and build its curriculum.</p>
+              <p className="font-bold text-lg text-gray-900">{editingCourse ? "Edit Course" : "Create Course"}</p>
+              <p className="text-sm text-gray-500">{editingCourse ? "Update course details and curriculum." : "Set up course details and build its curriculum."}</p>
             </div>
-            <button onClick={() => setShowForm(false)} aria-label="Close course editor" className="p-2 rounded-lg hover:bg-gray-100">
+            <button onClick={() => { setShowForm(false); setEditingCourse(null); }} aria-label="Close course editor" className="p-2 rounded-lg hover:bg-gray-100">
               <X size={20} className="text-gray-500" />
             </button>
           </div>
@@ -380,10 +439,10 @@ export default function Courses({ profile, onOpenCourse }: Props) {
             </div>
 
             <button
-              onClick={createCourse}
+              onClick={saveCourse}
               className="w-full bg-[#FFD700] text-[#0057B8] font-bold py-2.5 rounded-xl hover:brightness-95"
             >
-              Create Course
+              {editingCourse ? "Save Course Changes" : "Create Course"}
             </button>
           </div>
           </div>

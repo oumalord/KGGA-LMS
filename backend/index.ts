@@ -579,10 +579,22 @@ export const handler = router({
       const me = await requireProfile(ctx);
       const [course] = await db.get<any>("courses", [ctx.params.id]);
       if (!course) return error("Course not found", 404);
-      if (!me || (me.authUserId !== course.trainerId && !isStaff(me.role))) return error("Forbidden", 403);
+      if (!me || (me.authUserId !== course.trainerId && !isSuper(me.role))) return error("Forbidden", 403);
       const body = ctx.body as any;
-      const updated = { ...course, ...body };
+      const updated = {
+        ...course,
+        title: body.title ?? course.title,
+        description: body.description ?? course.description,
+        category: body.category ?? course.category,
+        modules: body.modules ?? course.modules,
+        coverColor: body.coverColor ?? course.coverColor,
+        coverResourceId: body.coverResourceId ?? course.coverResourceId,
+        isPaid: body.isPaid ?? course.isPaid,
+        price: body.price ?? course.price,
+        certificateTemplate: body.certificateTemplate ?? course.certificateTemplate,
+      };
       await db.update("courses", [{ id: ctx.params.id, record: updated }]);
+      await writeAudit(ctx.user!.userId, me.name, "UPDATE_COURSE", course.title, "Course updated");
       return json({ success: true });
     },
   ],
@@ -593,7 +605,7 @@ export const handler = router({
       const me = await requireProfile(ctx);
       const [course] = await db.get<any>("courses", [ctx.params.id]);
       if (!course) return error("Course not found", 404);
-      if (!me || (me.authUserId !== course.trainerId && !isStaff(me.role))) return error("Forbidden", 403);
+      if (!me || (me.authUserId !== course.trainerId && !isSuper(me.role))) return error("Forbidden", 403);
       await db.delete("courses", [ctx.params.id]);
       return json({ success: true });
     },
