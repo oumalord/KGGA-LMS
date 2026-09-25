@@ -59,6 +59,16 @@ function isCourseCreator(role?: string) {
   return role === "trainer" || role === "coordinator" || role === "admin" || role === "superadmin";
 }
 
+function hideCourseMaterials(course: any) {
+  return {
+    ...course,
+    modules: (course.modules ?? []).map((module: any) => ({
+      ...module,
+      lessons: (module.lessons ?? []).map(({ id, title, type, durationMin }: any) => ({ id, title, type, durationMin })),
+    })),
+  };
+}
+
 async function writeAudit(actorId: string, actorName: string, action: string, target: string, details: string) {
   await db.add("audit_log", [{ actorId, actorName, action, target, details, timestamp: Date.now() }]);
 }
@@ -508,9 +518,11 @@ export const handler = router({
 
   "GET /api/courses": [
     requireAuth(),
-    async () => {
+    async (ctx) => {
+      const me = await requireProfile(ctx);
       const { items } = await db.list("courses", { limit: 200 });
-      return json({ courses: items });
+      const courses = me?.role === "learner" ? items.map(hideCourseMaterials) : items;
+      return json({ courses });
     },
   ],
 
@@ -549,6 +561,14 @@ export const handler = router({
     async (ctx) => {
       const [course] = await db.get("courses", [ctx.params.id]);
       if (!course) return error("Course not found", 404);
+      const me = await requireProfile(ctx);
+      if (me?.role === "learner") {
+        const { items: enrollments } = await db.list("enrollments", {
+          filter: { courseId: ctx.params.id, userId: me.authUserId },
+          limit: 1,
+        });
+        if (!enrollments.length) return json({ course: { id: ctx.params.id, ...hideCourseMaterials(course) } });
+      }
       return json({ course: { id: ctx.params.id, ...course } });
     },
   ],

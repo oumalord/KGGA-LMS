@@ -94,6 +94,9 @@ export default function CourseDetail({ courseId, profile, onBack }: Props) {
   if (!course) return <p className="text-sm text-gray-400">Loading course...</p>;
 
   const totalLessons = course.modules.reduce((s, m) => s + m.lessons.length, 0);
+  const canStudy = Boolean(enrollment)
+    || course.trainerId === profile.authUserId
+    || ["coordinator", "admin", "superadmin"].includes(profile.role);
 
   return (
     <div>
@@ -210,8 +213,9 @@ export default function CourseDetail({ courseId, profile, onBack }: Props) {
         </div>
       )}
 
-      <div className="space-y-5">
-        {course.modules.map((m, i) => (
+      {canStudy ? (
+        <div className="space-y-5">
+          {course.modules.map((m, i) => (
           <div key={m.id} className="bg-white rounded-2xl border border-gray-50 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-50 bg-gray-50/50">
               <p className="font-bold text-gray-900 text-sm">
@@ -321,8 +325,15 @@ export default function CourseDetail({ courseId, profile, onBack }: Props) {
               })}
             </div>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+          <Lock className="mx-auto text-[#0057B8] mb-3" size={28} />
+          <p className="font-semibold text-gray-900">Enroll to start learning</p>
+          <p className="text-sm text-gray-500 mt-1">Course lessons and study materials become available after enrollment.</p>
+        </div>
+      )}
     </div>
   );
 }

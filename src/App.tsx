@@ -58,6 +58,7 @@ function App() {
   const [checking, setChecking] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [showLearnerWebsite, setShowLearnerWebsite] = useState(false);
   const [needsRoleSelection, setNeedsRoleSelection] = useState(false);
   const [registrationRequested, setRegistrationRequested] = useState(false);
   const [roleError, setRoleError] = useState<string | null>(null);
@@ -100,9 +101,11 @@ function App() {
       const r = await api.get("/api/me");
       const payload = r.data as any;
       setProfile(payload.profile);
+      setShowLearnerWebsite(payload.profile?.role === "learner");
       setNeedsRoleSelection(!!payload.needsRoleSelection);
     } catch {
       setProfile(null);
+      setShowLearnerWebsite(false);
     }
   }
 
@@ -123,6 +126,7 @@ function App() {
       const signInResult = await auth.signIn(details.email, details.password);
       if (!signInResult.profile) return "Your account was created, but automatic sign-in failed. Please sign in with your email and password.";
       setProfile(registeredProfile);
+      setShowLearnerWebsite(true);
       setNeedsRoleSelection(false);
       setRegistrationRequested(false);
       setPage("dashboard");
@@ -169,6 +173,7 @@ function App() {
 
       if (payload.profile) {
         setProfile(payload.profile);
+        setShowLearnerWebsite(payload.profile.role === "learner");
         setNeedsRoleSelection(false);
         setPage("dashboard");
         setStudentLoginHint(null);
@@ -179,6 +184,7 @@ function App() {
 
       if (signInResult?.profile) {
         setProfile(signInResult.profile);
+        setShowLearnerWebsite(signInResult.profile.role === "learner");
         setNeedsRoleSelection(false);
         setPage("dashboard");
         setStudentLoginHint(null);
@@ -194,6 +200,7 @@ function App() {
   async function handleSignOut() {
     await auth.signOut();
     setProfile(null);
+    setShowLearnerWebsite(false);
     setPage("dashboard");
   }
 
@@ -202,8 +209,14 @@ function App() {
   }
 
   function openCourse(id: string) {
+    setShowLearnerWebsite(false);
     setActiveCourseId(id);
     setPage("course-detail");
+  }
+
+  function navigate(page: Page) {
+    setPage(page);
+    if (profile?.role === "learner") setShowLearnerWebsite(page === "dashboard");
   }
 
   if (checking) {
@@ -252,13 +265,27 @@ function App() {
     return <ProfilePage profile={profile} requirePasswordChange onPasswordChanged={handlePasswordChanged} />;
   }
 
+  if (profile.role === "learner" && showLearnerWebsite) {
+    return (
+      <Landing
+        onSignIn={handleSignIn}
+        signingIn={signingIn}
+        settings={settings}
+        heroFallback={heroImageDataUrl}
+        onRegister={() => {}}
+        authenticated
+        onBrowseCourses={() => { setShowLearnerWebsite(false); setPage("courses"); }}
+      />
+    );
+  }
+
   const isSuper = profile.role === "superadmin";
   const canViewSiteSettings = profile.role === "admin" || isSuper;
   const isCourseManager = ["trainer", "coordinator", "admin", "superadmin"].includes(profile.role);
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] flex">
-      <Sidebar page={page} setPage={setPage} profile={profile} onSignOut={handleSignOut} mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} settings={settings} />
+      <Sidebar page={page} setPage={navigate} profile={profile} onSignOut={handleSignOut} mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} settings={settings} />
       <div className="flex-1 min-w-0">
         <div className="lg:hidden flex items-center justify-between px-5 py-3.5 bg-white/80 backdrop-blur-xl border-b border-black/5 sticky top-0 z-20">
           <button onClick={() => setMobileOpen(true)} className="text-gray-500">

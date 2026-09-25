@@ -19,6 +19,8 @@ interface Props {
   signInError?: string | null;
   onRegister: () => void;
   onStudentLoginDismissed?: () => void;
+  authenticated?: boolean;
+  onBrowseCourses?: () => void;
 }
 
 interface PublicCourse {
@@ -32,7 +34,7 @@ interface PublicCourse {
   lessonCount: number;
 }
 
-export default function Landing({ onSignIn, signingIn, settings, heroFallback, autoOpenStudentLogin, studentNotice, signInError, onRegister, onStudentLoginDismissed }: Props) {
+export default function Landing({ onSignIn, signingIn, settings, heroFallback, autoOpenStudentLogin, studentNotice, signInError, onRegister, onStudentLoginDismissed, authenticated = false, onBrowseCourses }: Props) {
   const [courses, setCourses] = useState<PublicCourse[]>([]);
   const [videos, setVideos] = useState<KGGAVideo[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -74,6 +76,21 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  function handleCoursesNav(e: React.MouseEvent) {
+    if (authenticated) {
+      e.preventDefault();
+      setMobileNavOpen(false);
+      onBrowseCourses?.();
+      return;
+    }
+    scrollToSection(e, "courses");
+  }
+
+  function browseCourses() {
+    if (authenticated) onBrowseCourses?.();
+    else openLogin();
+  }
+
   function submitLogin(e: React.FormEvent) {
     e.preventDefault();
     if (!identifier.trim() || !password.trim()) {
@@ -112,32 +129,38 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
           </div>
           <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-[13px] font-medium text-white/70">
             <a href="#home" onClick={(e) => scrollToSection(e, "home")} className="text-white hover:text-[#FFD700] transition-colors">Home</a>
-            <a href="#courses" onClick={(e) => scrollToSection(e, "courses")} className="hover:text-white transition-colors">Courses</a>
+            <a href="#courses" onClick={handleCoursesNav} className="hover:text-white transition-colors">Courses</a>
             <a href="#features" onClick={(e) => scrollToSection(e, "features")} className="hover:text-white transition-colors">Features</a>
             <a href="#pricing" onClick={(e) => scrollToSection(e, "pricing")} className="hover:text-white transition-colors">Pricing</a>
             <a href="#about" onClick={(e) => scrollToSection(e, "about")} className="hover:text-white transition-colors">About</a>
             <a href="#partners" onClick={(e) => scrollToSection(e, "partners")} className="hover:text-white transition-colors">Partners</a>
           </nav>
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <button
-              onClick={() => {
-                setIsStudentMode(false);
-                setIdentifier("");
-                setPassword("");
-                setShowLoginCard((value) => !value);
-              }}
-              disabled={signingIn}
-              className="text-white/85 hover:text-white px-2.5 py-2 text-[12px] sm:text-sm font-medium disabled:opacity-60"
-            >
-              Log In
-            </button>
-            <button
-              onClick={onRegister}
-              disabled={signingIn}
-              className="bg-[#FFD700] text-[#071633] px-3 sm:px-4 py-2 rounded-lg font-bold text-[11px] sm:text-sm hover:brightness-95 transition-all disabled:opacity-60"
-            >
-              {signingIn ? "Signing in…" : "Student Access"}
-            </button>
+            {authenticated ? (
+              <button onClick={browseCourses} className="bg-[#FFD700] text-[#071633] px-3 sm:px-4 py-2 rounded-lg font-bold text-[11px] sm:text-sm hover:brightness-95">Browse Courses</button>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    setIsStudentMode(false);
+                    setIdentifier("");
+                    setPassword("");
+                    setShowLoginCard((value) => !value);
+                  }}
+                  disabled={signingIn}
+                  className="text-white/85 hover:text-white px-2.5 py-2 text-[12px] sm:text-sm font-medium disabled:opacity-60"
+                >
+                  Log In
+                </button>
+                <button
+                  onClick={onRegister}
+                  disabled={signingIn}
+                  className="bg-[#FFD700] text-[#071633] px-3 sm:px-4 py-2 rounded-lg font-bold text-[11px] sm:text-sm hover:brightness-95 transition-all disabled:opacity-60"
+                >
+                  {signingIn ? "Signing in…" : "Student Access"}
+                </button>
+              </>
+            )}
             <button onClick={() => setMobileNavOpen((v) => !v)} className="md:hidden text-white p-2 -mr-2" aria-label="Toggle navigation menu">
               {mobileNavOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -146,7 +169,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
         {mobileNavOpen && (
           <nav className="md:hidden border-t border-white/10 bg-[#071633] px-4 sm:px-6 py-3 flex flex-col gap-1 text-[13px] font-medium text-white/70">
             <a href="#home" onClick={(e) => scrollToSection(e, "home")} className="py-2 text-white">Home</a>
-            <a href="#courses" onClick={(e) => scrollToSection(e, "courses")} className="py-2 hover:text-white">Courses</a>
+            <a href="#courses" onClick={handleCoursesNav} className="py-2 hover:text-white">Courses</a>
             <a href="#features" onClick={(e) => scrollToSection(e, "features")} className="py-2 hover:text-white">Features</a>
             <a href="#pricing" onClick={(e) => scrollToSection(e, "pricing")} className="py-2 hover:text-white">Pricing</a>
             <a href="#about" onClick={(e) => scrollToSection(e, "about")} className="py-2 hover:text-white">About</a>
@@ -207,7 +230,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             <p className="text-white/65 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 max-w-md leading-relaxed">{settings.tagline}</p>
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6 sm:mb-8">
               <button
-                onClick={openLogin}
+                onClick={browseCourses}
                 className="inline-flex items-center justify-center gap-2 bg-[#FFD700] text-[#071633] px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl font-bold text-sm hover:brightness-95 shadow-lg shadow-black/20 transition-all w-full sm:w-auto"
               >
                 Explore Courses <ArrowRight size={16} />
@@ -296,7 +319,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
           </div>
         )}
         <div className="text-center mt-10">
-          <button onClick={openLogin} className="inline-flex items-center gap-2 bg-[#071633] text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-[#0a1f45]">
+          <button onClick={browseCourses} className="inline-flex items-center gap-2 bg-[#071633] text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-[#0a1f45]">
             View All Courses <ArrowRight size={15} />
           </button>
         </div>
@@ -397,7 +420,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
             <p className="text-white/70 text-sm">Join thousands of learners and take the first step in your career growth.</p>
           </div>
           <div className="relative flex items-center gap-3">
-            <button onClick={openLogin} className="bg-[#FFD700] text-[#0057B8] px-6 py-3 rounded-xl font-bold text-sm hover:brightness-95 flex items-center gap-2">
+            <button onClick={browseCourses} className="bg-[#FFD700] text-[#0057B8] px-6 py-3 rounded-xl font-bold text-sm hover:brightness-95 flex items-center gap-2">
               Get Started for Free <ArrowRight size={15} />
             </button>
             <p className="text-white/60 text-[11px] hidden sm:flex items-center gap-1">
