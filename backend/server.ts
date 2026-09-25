@@ -62,6 +62,26 @@ function matchRoute(method: string, path: string) {
 }
 
 const app = express();
+const allowedOrigins = new Set([
+  "https://kenyagirlguidesassociationlms.co.ke",
+  "https://www.kenyagirlguidesassociationlms.co.ke",
+]);
+
+app.use((request, response, next) => {
+  const origin = request.header("origin");
+  if (origin && allowedOrigins.has(origin)) {
+    response.setHeader("Access-Control-Allow-Origin", origin);
+    response.setHeader("Vary", "Origin");
+    response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+    if (request.method === "OPTIONS") {
+      response.sendStatus(204);
+      return;
+    }
+  }
+  next();
+});
+
 app.use(express.json({ limit: "50mb" }));
 
 app.use(async (_request, _response, next) => {

@@ -9,6 +9,13 @@ type ApiClient = {
 
 const SESSION_KEY = "kgga-lms-session";
 const REQUEST_TIMEOUT_MS = 8_000;
+const API_ORIGIN = window.location.hostname === "kenyagirlguidesassociationlms.co.ke"
+  ? "https://www.kenyagirlguidesassociationlms.co.ke"
+  : "";
+
+function apiUrl(path: string) {
+  return `${API_ORIGIN}${path}`;
+}
 
 async function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", url: string, body?: unknown): Promise<ApiResponse<T>> {
   const token = window.localStorage.getItem(SESSION_KEY);
@@ -18,7 +25,7 @@ async function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", url: string
   const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   let response: Response;
   try {
-    response = await fetch(url, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: controller.signal });
+    response = await fetch(apiUrl(url), { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: controller.signal });
   } finally {
     window.clearTimeout(timeoutId);
   }
@@ -38,7 +45,7 @@ export const auth = {
     const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     let response: Response;
     try {
-      response = await fetch("/api/auth/login", {
+      response = await fetch(apiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ identifier, password }),
