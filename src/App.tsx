@@ -144,7 +144,7 @@ function App() {
       ];
       await Promise.race([
         Promise.all(tasks),
-        new Promise<void>((resolve) => window.setTimeout(resolve, 1_500)),
+        new Promise<void>((resolve) => window.setTimeout(resolve, 1_000)),
       ]);
       setChecking(false);
     })();

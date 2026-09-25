@@ -1095,9 +1095,8 @@ export const handler = router({
   "GET /api/resources/:id/url": [
     requireAuth(),
     async (ctx) => {
-      const [resource] = await db.get<any>("resources", [ctx.params.id]);
-      if (!resource) return error("Not found", 404);
-      const [{ url }] = await storage.url([resource.path]);
+      const url = await storage.resourceUrl(ctx.params.id);
+      if (!url) return error("Not found", 404);
       return json({ url });
     },
   ],

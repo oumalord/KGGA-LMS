@@ -11,6 +11,7 @@ let schemaReady: Promise<void> | undefined;
 const URL_CACHE_TTL_MS = 10 * 60 * 1000;
 const URL_CACHE_MAX_ENTRIES = 100;
 const urlCache = new Map<string, { url: string; expiresAt: number }>();
+const resourceUrlCache = new Map<string, { path: string; url: string; expiresAt: number }>();
 
 function ensureSchema() {
   schemaReady ??= (async () => {
@@ -33,6 +34,9 @@ export const storage = {
         VALUES (${file.path}, ${file.content}, ${file.contentType})
         ON CONFLICT (path) DO UPDATE SET content_base64 = EXCLUDED.content_base64, content_type = EXCLUDED.content_type, created_at = NOW()`;
       urlCache.delete(file.path);
+      for (const [id, cached] of resourceUrlCache) {
+        if (cached.path === file.path) resourceUrlCache.delete(id);
+      }
       results.push(true);
     }
     return results;
@@ -60,9 +64,31 @@ export const storage = {
     return urls;
   },
 
+  async resourceUrl(id: string) {
+    const cached = resourceUrlCache.get(id);
+    if (cached && cached.expiresAt > Date.now()) return cached.url;
+
+    const [file] = await sql.query(
+      "SELECT files.path, files.content_base64, files.content_type FROM resources JOIN files ON files.path = resources.record->>'path' WHERE resources.id = $1::uuid",
+      [id],
+    );
+    if (!file) return null;
+
+    const url = `data:${file.content_type};base64,${file.content_base64}`;
+    if (resourceUrlCache.size >= URL_CACHE_MAX_ENTRIES) {
+      const oldestId = resourceUrlCache.keys().next().value;
+      if (oldestId) resourceUrlCache.delete(oldestId);
+    }
+    resourceUrlCache.set(id, { path: file.path as string, url, expiresAt: Date.now() + URL_CACHE_TTL_MS });
+    return url;
+  },
+
   async delete(paths: string[]) {
     await ensureSchema();
     await sql`DELETE FROM files WHERE path = ANY(${paths}::text[])`;
     for (const path of paths) urlCache.delete(path);
+    for (const [id, cached] of resourceUrlCache) {
+      if (paths.includes(cached.path)) resourceUrlCache.delete(id);
+    }
   },
 };
