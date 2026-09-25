@@ -138,7 +138,7 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
           </nav>
           <div className="flex items-center gap-1.5 sm:gap-2">
             {authenticated ? (
-              <button onClick={browseCourses} className="bg-[#FFD700] text-[#071633] px-3 sm:px-4 py-2 rounded-lg font-bold text-[11px] sm:text-sm hover:brightness-95">Browse Courses</button>
+              <button onClick={browseCourses} className="bg-[#FFD700] text-[#071633] px-3 sm:px-4 py-2 rounded-lg font-bold text-[11px] sm:text-sm hover:brightness-95">Explore Courses</button>
             ) : (
               <>
                 <button

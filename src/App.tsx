@@ -58,6 +58,7 @@ function App() {
   const [checking, setChecking] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [showLearnerWebsite, setShowLearnerWebsite] = useState(false);
   const [needsRoleSelection, setNeedsRoleSelection] = useState(false);
   const [registrationRequested, setRegistrationRequested] = useState(false);
   const [roleError, setRoleError] = useState<string | null>(null);
@@ -100,9 +101,11 @@ function App() {
       const r = await api.get("/api/me");
       const payload = r.data as any;
       setProfile(payload.profile);
+      setShowLearnerWebsite(payload.profile?.role === "learner");
       setNeedsRoleSelection(!!payload.needsRoleSelection);
     } catch {
       setProfile(null);
+      setShowLearnerWebsite(false);
     }
   }
 
@@ -123,6 +126,7 @@ function App() {
       const signInResult = await auth.signIn(details.email, details.password);
       if (!signInResult.profile) return "Your account was created, but automatic sign-in failed. Please sign in with your email and password.";
       setProfile(registeredProfile);
+      setShowLearnerWebsite(registeredProfile.role === "learner");
       setNeedsRoleSelection(false);
       setRegistrationRequested(false);
       setPage("dashboard");
@@ -157,6 +161,7 @@ function App() {
       const signInResult = await auth.signIn(normalizedIdentifier, password);
       if (!signInResult.profile) return;
       setProfile(signInResult.profile);
+      setShowLearnerWebsite(signInResult.profile.role === "learner");
       setNeedsRoleSelection(false);
       setPage("dashboard");
       setStudentLoginHint(null);
@@ -171,6 +176,7 @@ function App() {
   async function handleSignOut() {
     await auth.signOut();
     setProfile(null);
+    setShowLearnerWebsite(false);
     setPage("dashboard");
   }
 
@@ -179,12 +185,14 @@ function App() {
   }
 
   function openCourse(id: string) {
+    setShowLearnerWebsite(false);
     setActiveCourseId(id);
     setPage("course-detail");
   }
 
   function navigate(page: Page) {
     setPage(page);
+    setShowLearnerWebsite(profile?.role === "learner" && page === "dashboard");
   }
 
   if (checking) {
@@ -231,6 +239,20 @@ function App() {
 
   if (profile.mustChangePassword) {
     return <ProfilePage profile={profile} requirePasswordChange onPasswordChanged={handlePasswordChanged} />;
+  }
+
+  if (profile.role === "learner" && showLearnerWebsite) {
+    return (
+      <Landing
+        onSignIn={handleSignIn}
+        signingIn={signingIn}
+        settings={settings}
+        heroFallback={heroImageDataUrl}
+        onRegister={() => {}}
+        authenticated
+        onBrowseCourses={() => { setShowLearnerWebsite(false); setPage("courses"); }}
+      />
+    );
   }
 
   const isSuper = profile.role === "superadmin";
