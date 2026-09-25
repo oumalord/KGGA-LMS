@@ -31,6 +31,7 @@ interface PublicCourse {
   isPaid: boolean;
   price: number;
   coverColor: string;
+  coverUrl?: string | null;
   lessonCount: number;
 }
 
@@ -298,8 +299,13 @@ export default function Landing({ onSignIn, signingIn, settings, heroFallback, a
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {courses.map((c) => (
               <div key={c.id} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-lg transition-all">
-                <div className="h-28 flex items-center justify-center relative" style={{ background: c.coverColor }}>
-                  <BookOpen className="text-white/80" size={30} />
+                <div className="h-28 flex items-center justify-center relative overflow-hidden" style={{ background: c.coverColor }}>
+                  {c.coverUrl ? (
+                    <img src={c.coverUrl} alt={`${c.title} cover`} className="absolute inset-0 w-full h-full object-cover" />
+                  ) : (
+                    <BookOpen className="text-white/80" size={30} />
+                  )}
+                  {c.coverUrl && <div className="absolute inset-0 bg-black/15" />}
                   <span className="absolute top-2.5 left-2.5 bg-white/90 text-[10px] font-bold px-2 py-0.5 rounded-full text-gray-700">{c.category}</span>
                 </div>
                 <div className="p-4">

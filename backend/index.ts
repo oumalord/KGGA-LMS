@@ -425,10 +425,20 @@ export const handler = router({
   "GET /api/public/courses": [
     async () => {
       const { items } = await db.list("courses", { limit: 12 });
-      const preview = (items as any[])
+      const preview = await Promise.all((items as any[])
         .sort((a, b) => b.createdAt - a.createdAt)
         .slice(0, 8)
-        .map((c) => ({
+        .map(async (c) => {
+          let coverUrl: string | null = null;
+          if (c.coverResourceId) {
+            const [cover] = await db.get<any>("resources", [c.coverResourceId]);
+            if (cover?.path) {
+              try {
+                coverUrl = (await storage.url([cover.path]))[0].url;
+              } catch {}
+            }
+          }
+          return {
           id: c.id,
           title: c.title,
           category: c.category,
@@ -436,7 +446,9 @@ export const handler = router({
           isPaid: c.isPaid,
           price: c.price,
           coverColor: c.coverColor,
+          coverUrl,
           lessonCount: (c.modules ?? []).reduce((s: number, m: any) => s + (m.lessons?.length ?? 0), 0),
+          };
         }));
       return json({ courses: preview });
     },
